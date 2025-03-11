@@ -13,7 +13,7 @@ public class Estudiante implements Serializable {
     private int id_Estudiante;
     private String nombre;
     private String apellido;
-    private String tarjetaIdentidad;  // Cambiado a String
+    private String registro_civil;  // Cambiado a String
     private String grado;  // Manteniendo como String
     private String anio;  // Cambiado a String
 
@@ -23,7 +23,7 @@ public class Estudiante implements Serializable {
     public Estudiante(int id_Estudiante, String nombre,  String apellido, String tarjetaIdentidad, String grado, String anio, String observaciones) {
         this.id_Estudiante = id_Estudiante;
         this.nombre = nombre;
-        this.tarjetaIdentidad = tarjetaIdentidad;
+        this.registro_civil = tarjetaIdentidad;
         this.grado = grado;
         this.anio = anio;
 
@@ -54,12 +54,16 @@ public class Estudiante implements Serializable {
         this.apellido = apellido ;
     }
 
-    public String getTarjetaIdentidad() {
-        return tarjetaIdentidad;
+    public String getregistro_civil() {
+        return registro_civil;
     }
 
-    public void setTarjetaIdentidad(String tarjetaIdentidad) {
-        this.tarjetaIdentidad = tarjetaIdentidad;
+    public void setregistro_civil(String registro_civil) {
+        if (registro_civil.matches("\\d{10,11}")) {
+           this.registro_civil = registro_civil;
+        } else {
+            throw new IllegalArgumentException ( "El resgitro civil debe tener mínimo 10 digitos y máximo 11 digitos. ");
+        }
     }
 
     public String getGrado() {

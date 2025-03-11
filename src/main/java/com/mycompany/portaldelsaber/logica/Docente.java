@@ -55,7 +55,11 @@ public class Docente implements Serializable {
     }
 
     public void setCedula(String cedula) {
-        this.cedula = cedula;
+        if (cedula.matches("\\d{8,10}")){
+            this.cedula = cedula;
+        } else {
+            throw new IllegalArgumentException("La cédula debe contener máximo 10 dígitos numéricos.");
+        }
     }
 
     public String getAnio() {

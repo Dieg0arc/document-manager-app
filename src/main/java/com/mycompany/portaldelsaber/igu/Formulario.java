@@ -1,6 +1,8 @@
 
 package com.mycompany.portaldelsaber.igu;
 
+import javax.swing.JOptionPane;
+
 public class Formulario extends javax.swing.JFrame {
 
     public Formulario() {
@@ -14,9 +16,9 @@ public class Formulario extends javax.swing.JFrame {
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
-        jButton2 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
-        jButton4 = new javax.swing.JButton();
+        btnEstudiante = new javax.swing.JButton();
+        btnSalirApp = new javax.swing.JButton();
+        btnDocente = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -27,30 +29,33 @@ public class Formulario extends javax.swing.JFrame {
         jLabel1.setForeground(new java.awt.Color(0, 0, 0));
         jLabel1.setText("El portal del saber");
 
-        jButton2.setBackground(new java.awt.Color(255, 255, 0));
-        jButton2.setForeground(new java.awt.Color(102, 0, 204));
-        jButton2.setText("Estudiante");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
+        btnEstudiante.setBackground(new java.awt.Color(255, 255, 0));
+        btnEstudiante.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
+        btnEstudiante.setForeground(new java.awt.Color(102, 0, 204));
+        btnEstudiante.setText("Estudiante");
+        btnEstudiante.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+                btnEstudianteActionPerformed(evt);
             }
         });
 
-        jButton3.setBackground(new java.awt.Color(255, 255, 0));
-        jButton3.setForeground(new java.awt.Color(102, 0, 204));
-        jButton3.setText("Salir");
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
+        btnSalirApp.setBackground(new java.awt.Color(255, 255, 0));
+        btnSalirApp.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
+        btnSalirApp.setForeground(new java.awt.Color(102, 0, 204));
+        btnSalirApp.setText("Salir");
+        btnSalirApp.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
+                btnSalirAppActionPerformed(evt);
             }
         });
 
-        jButton4.setBackground(new java.awt.Color(255, 255, 0));
-        jButton4.setForeground(new java.awt.Color(102, 0, 204));
-        jButton4.setText("Docentes");
-        jButton4.addActionListener(new java.awt.event.ActionListener() {
+        btnDocente.setBackground(new java.awt.Color(255, 255, 0));
+        btnDocente.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
+        btnDocente.setForeground(new java.awt.Color(102, 0, 204));
+        btnDocente.setText("Docentes");
+        btnDocente.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton4ActionPerformed(evt);
+                btnDocenteActionPerformed(evt);
             }
         });
 
@@ -61,24 +66,24 @@ public class Formulario extends javax.swing.JFrame {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addGap(45, 45, 45)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 275, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 275, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 275, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(btnDocente, javax.swing.GroupLayout.PREFERRED_SIZE, 275, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnEstudiante, javax.swing.GroupLayout.PREFERRED_SIZE, 275, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnSalirApp, javax.swing.GroupLayout.PREFERRED_SIZE, 275, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(46, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap(62, Short.MAX_VALUE)
-                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(btnEstudiante, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(btnDocente, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(btnSalirApp, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(60, 60, 60))
         );
 
-        jLabel2.setIcon(new javax.swing.ImageIcon("C:\\Users\\Asus\\Desktop\\Preescolar\\Portal_Saber.jpg")); // NOI18N
+        jLabel2.setIcon(new javax.swing.ImageIcon("C:\\Users\\Asus\\Desktop\\Mis codigos\\logot3.jpg")); // NOI18N
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -129,30 +134,39 @@ public class Formulario extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+    private void btnEstudianteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEstudianteActionPerformed
 Estudiante estu = new Estudiante();
 estu.setVisible(true);
 estu.setLocationRelativeTo(null);
 this.dispose(); 
-    }//GEN-LAST:event_jButton2ActionPerformed
+    }//GEN-LAST:event_btnEstudianteActionPerformed
 
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton3ActionPerformed
+    private void btnSalirAppActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalirAppActionPerformed
+                                       
+        int confirm = JOptionPane.showConfirmDialog(this, 
+                "¿Estás seguro de que quieres salir?", 
+                "Confirmar salida", 
+                JOptionPane.YES_NO_OPTION, 
+                JOptionPane.WARNING_MESSAGE);
+    
+        if (confirm == JOptionPane.YES_OPTION) {
+            System.exit(0); // Cierra la aplicación
+        }
+    }//GEN-LAST:event_btnSalirAppActionPerformed
 
-    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+    private void btnDocenteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDocenteActionPerformed
 Docente docente = new Docente();
 docente.setVisible(true);
 docente.setLocationRelativeTo(null);
 this.dispose();
-    }//GEN-LAST:event_jButton4ActionPerformed
+    }//GEN-LAST:event_btnDocenteActionPerformed
 
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
+    private javax.swing.JButton btnDocente;
+    private javax.swing.JButton btnEstudiante;
+    private javax.swing.JButton btnSalirApp;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
