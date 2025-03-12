@@ -1,19 +1,60 @@
 
 package com.mycompany.portaldelsaber.igu;
 
-import java.sql.Connection;
 import java.sql.DriverManager;
+import javax.swing.JOptionPane;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import javax.swing.JOptionPane;
 
 
 public class CargaDatosEstudiantes extends javax.swing.JFrame {
 
 
-    public CargaDatosEstudiantes() {
-        initComponents();
-    }
+public CargaDatosEstudiantes() {
+    initComponents();
+    configurarValidaciones();
+}
+
+private void configurarValidaciones() {
+    // Validar que solo ingresen letras y espacios en Nombre
+    txtNombreEstudiante.addKeyListener(new java.awt.event.KeyAdapter() {
+        public void keyTyped(java.awt.event.KeyEvent evt) {
+            char c = evt.getKeyChar();
+            if (!Character.isLetter(c) && !Character.isWhitespace(c)) {
+                evt.consume(); // No permite el carácter
+            } else {
+                txtNombreEstudiante.setText(txtNombreEstudiante.getText().toUpperCase());
+            }
+        }
+    });
+
+    // Validar que solo ingresen letras y espacios en Apellidos
+    txtApellidosEstudiante.addKeyListener(new java.awt.event.KeyAdapter() {
+        public void keyTyped(java.awt.event.KeyEvent evt) {
+            char c = evt.getKeyChar();
+            if (!Character.isLetter(c) && !Character.isWhitespace(c)) {
+                evt.consume(); // No permite el carácter
+            } else {
+                txtApellidosEstudiante.setText(txtApellidosEstudiante.getText().toUpperCase());
+            }
+        }
+    });
+
+    // Validar Registro Civil (solo números, mínimo 10 y máximo 11 dígitos)
+    txtRC.addKeyListener(new java.awt.event.KeyAdapter() {
+        public void keyTyped(java.awt.event.KeyEvent evt) {
+            char c = evt.getKeyChar();
+            if (!Character.isDigit(c)) {
+                evt.consume(); // Solo permite números
+            }
+            if (txtRC.getText().length() >= 11) {
+                evt.consume(); // No permite más de 11 dígitos
+            }
+        }
+    });
+}
+
 
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -44,7 +85,7 @@ public class CargaDatosEstudiantes extends javax.swing.JFrame {
 
         jLabel2.setText("Nombre");
 
-        jLabel3.setText("Tarjeta de Identidad");
+        jLabel3.setText("Registro civil");
 
         jLabel4.setText("Grado");
 
@@ -121,6 +162,7 @@ public class CargaDatosEstudiantes extends javax.swing.JFrame {
 
         jLabel6.setIcon(new javax.swing.ImageIcon("C:\\Users\\Asus\\Desktop\\Preescolar\\Portal_Saber.jpg")); // NOI18N
 
+        btnGuardarEstudiante.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
         btnGuardarEstudiante.setText("Guardar");
         btnGuardarEstudiante.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -128,6 +170,7 @@ public class CargaDatosEstudiantes extends javax.swing.JFrame {
             }
         });
 
+        btnLimpiarEstudiante.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
         btnLimpiarEstudiante.setText("Limpiar");
         btnLimpiarEstudiante.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -222,7 +265,7 @@ public class CargaDatosEstudiantes extends javax.swing.JFrame {
         
         try {
             Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/portalsaberdb", "root", "");
-            String sql = "INSERT INTO estudiantes (tarjeta_identidad, nombre, apellidos, grado, anio) VALUES (?, ?, ?, ?, ?);";
+            String sql = "INSERT INTO estudiantes (registro_civil, nombre, apellidos, grado, anio) VALUES (?, ?, ?, ?, ?);";
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setString(1, registro_civil);
             stmt.setString(2, nombre);
@@ -265,7 +308,7 @@ public class CargaDatosEstudiantes extends javax.swing.JFrame {
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
 
-        CargaDatosAcudiente acu = new CargaDatosAcudiente();
+        Estudiante acu = new Estudiante();
         acu.setVisible(true);
         acu.setLocationRelativeTo(null);
         this.dispose(); // Cierra la ventana actual

@@ -2,16 +2,14 @@
 package com.mycompany.portaldelsaber.igu;
 
 import com.mycompany.portaldelsaber.persistencia.ConexionBD;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import javax.swing.JOptionPane;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
+
 import javax.swing.JTextField;
 
 
@@ -19,10 +17,13 @@ public class CargaDatosAcudiente extends javax.swing.JFrame {
 
 public CargaDatosAcudiente() {
     initComponents();
-    
+
     // Deshabilitar el botón "Siguiente" al inicio
     btnSiguienteEstu.setEnabled(false);
-    
+
+    // Deshabilitar el segundo acudiente al inicio
+    habilitarSegundoAcudiente(false);
+
     // Validaciones de entrada
     validarSoloNumeros(txtCCA1, 10);
     validarSoloNumeros(txtPhoneAcu1, 11);
@@ -59,7 +60,6 @@ private void agregarValidacionTiempoReal() {
     txtPhoneAcu1.addKeyListener(new KeyAdapter() { public void keyReleased(KeyEvent e) { validarFormulario(); }});
 }
 
-
 // Método para validar solo números con un máximo de caracteres
 private void validarSoloNumeros(JTextField campo, int maxLength) {
     campo.addKeyListener(new KeyAdapter() {
@@ -79,7 +79,7 @@ private void validarSoloLetras(JTextField campo) {
         @Override
         public void keyTyped(KeyEvent evt) {
             char c = evt.getKeyChar();
-            if (!Character.isLetter(c) && c != ' ') {
+            if (!Character.isLetter(c) && c != ' ') { // Se permite el espacio
                 evt.consume();
             }
         }
@@ -100,7 +100,6 @@ private void habilitarSegundoAcudiente(boolean habilitado) {
         txtPhoneAcu2.setText("");
     }
 }
-
 
 
     @SuppressWarnings("unchecked")

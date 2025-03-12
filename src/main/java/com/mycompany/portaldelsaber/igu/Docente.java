@@ -31,6 +31,7 @@ public class Docente extends javax.swing.JFrame {
         jLabel1.setText("Portal del saber");
 
         jButton1.setBackground(new java.awt.Color(255, 255, 0));
+        jButton1.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
         jButton1.setForeground(new java.awt.Color(102, 0, 204));
         jButton1.setText("Consultar");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -40,6 +41,7 @@ public class Docente extends javax.swing.JFrame {
         });
 
         jButton2.setBackground(new java.awt.Color(255, 255, 0));
+        jButton2.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
         jButton2.setForeground(new java.awt.Color(102, 0, 204));
         jButton2.setText("Cargar Datos Docente");
         jButton2.addActionListener(new java.awt.event.ActionListener() {
