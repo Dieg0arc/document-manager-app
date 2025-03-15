@@ -476,7 +476,7 @@ private void habilitarSegundoAcudiente(boolean habilitado) {
     }//GEN-LAST:event_txtNombreAcu2ActionPerformed
 
     private void btnBackAcu1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackAcu1ActionPerformed
-        Estudiante estu = new Estudiante();
+        MenuEstudiante estu = new MenuEstudiante();
         estu.setVisible(true);
         estu.setLocationRelativeTo(null);
         this.dispose();
