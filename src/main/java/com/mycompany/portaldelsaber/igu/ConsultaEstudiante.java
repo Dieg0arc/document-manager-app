@@ -11,7 +11,7 @@ import javax.swing.JOptionPane;
 import com.mycompany.portaldelsaber.persistencia.ConexionBD;
 
 public class ConsultaEstudiante extends javax.swing.JFrame {
-
+    
 public ConsultaEstudiante() {
         initComponents();
         btnConsultarE.addActionListener(new ActionListener() {
@@ -21,40 +21,112 @@ public ConsultaEstudiante() {
             }
         });
     }
+private void consultarEstudiante(){
+    String registroCivil = txtRCC.getText().trim();
+    String nombre = txtNombreC.getText().trim();
+    String apellidos = txtApellidosC.getText().trim();
+    String grado = cmbGradoC.getSelectedItem().toString();
+    String anio = txtAnioC.getText().trim();
+    
+    // Verify if at least one field has valid search data
+    if ((registroCivil.isEmpty() || registroCivil.equals("Ingrese el registro civil")) &&
+        (nombre.isEmpty() || nombre.equals("Ingrese el nombre")) &&
+        (apellidos.isEmpty() || apellidos.equals("Ingrese los apellidos")) &&
+        (grado.equals("-") || grado.equals(" ")) &&
+        (anio.isEmpty() || anio.equals("Ingrese el año"))) {
+        JOptionPane.showMessageDialog(this, "Ingrese al menos un criterio de búsqueda.", "Error", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
 
-    private void consultarEstudiante() {
-        String registroCivil = txtRCC.getText().trim();
-        if (registroCivil.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Ingrese un número de Registro Civil.", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
+    try (Connection con = ConexionBD.conectar()) {
+        // Build dynamic SQL query based on provided fields
+        StringBuilder sqlBuilder = new StringBuilder("SELECT * FROM estudiantes WHERE 1=1");
+        
+        // Prepare parameters list
+        java.util.List<Object> params = new java.util.ArrayList<>();
+        
+        // Add conditions based on provided fields
+        if (!registroCivil.isEmpty() && !registroCivil.equals("Ingrese el registro civil")) {
+            sqlBuilder.append(" AND registro_civil = ?");
+            params.add(registroCivil);
         }
-
-        try (Connection con = ConexionBD.conectar()) {
-            String sql = "SELECT * FROM estudiantes WHERE registro_civil = ?";
-            PreparedStatement ps = con.prepareStatement(sql);
-            ps.setString(1, registroCivil);
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
+        
+        if (!nombre.isEmpty() && !nombre.equals("Ingrese el nombre")) {
+            sqlBuilder.append(" AND nombre LIKE ?");
+            params.add("%" + nombre + "%");
+        }
+        
+        if (!apellidos.isEmpty() && !apellidos.equals("Ingrese los apellidos")) {
+            sqlBuilder.append(" AND apellidos LIKE ?");
+            params.add("%" + apellidos + "%");
+        }
+        
+        if (!grado.equals("-") && !grado.equals(" ")) {
+            sqlBuilder.append(" AND grado = ?");
+            params.add(grado);
+        }
+        
+        if (!anio.isEmpty() && !anio.equals("Ingrese el año")) {
+            sqlBuilder.append(" AND anio = ?");
+            params.add(anio);
+        }
+        
+        // Prepare statement with dynamic query
+        PreparedStatement ps = con.prepareStatement(sqlBuilder.toString());
+        
+        // Set parameters
+        for (int i = 0; i < params.size(); i++) {
+            ps.setObject(i + 1, params.get(i));
+        }
+        
+        // Execute query
+        ResultSet rs = ps.executeQuery();
+        
+        boolean found = false;
+        StringBuilder resultText = new StringBuilder();
+        
+        while (rs.next()) {
+            found = true;
+            
+            // Set values to form fields for the first result
+            if (resultText.length() == 0) {
                 txtNombreC.setText(rs.getString("nombre"));
                 txtApellidosC.setText(rs.getString("apellidos"));
-                cmbGradoC.setSelectedItem("valor");
-                cmbAnioC.setSelectedItem("valor");
-
-                
-                // Obtener ruta del archivo (Ejemplo: C:/2025/estudiante/Transicion/documento.pdf)
-                String rutaArchivo = "C:/" + rs.getString("anio") + "/estudiante/" + rs.getString("grado") + "/" + registroCivil + ".pdf";
-                txtRespuesta.setText(rutaArchivo);
-            } else {
-                JOptionPane.showMessageDialog(this, "Estudiante no encontrado.", "Información", JOptionPane.INFORMATION_MESSAGE);
+                txtAnioC.setText(rs.getString("anio"));
+                // Set the grade in the combo box
+                for (int i = 0; i < cmbGradoC.getItemCount(); i++) {
+                    if (cmbGradoC.getItemAt(i).equals(rs.getString("grado"))) {
+                        cmbGradoC.setSelectedIndex(i);
+                        break;
+                    }
+                }
             }
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Error al consultar: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            
+            // Get document path for each student
+            String rc = rs.getString("registro_civil");
+            String studentGrado = rs.getString("grado");
+            String studentAnio = rs.getString("anio");
+            String rutaArchivo = "C:/" + studentAnio + "/estudiante/" + studentGrado + "/" + rc + ".pdf";
+            
+            // Add result to the text area
+            resultText.append("Estudiante: ").append(rs.getString("nombre")).append(" ")
+                     .append(rs.getString("apellidos")).append(" (RC: ").append(rc)
+                     .append(") - Archivo: ").append(rutaArchivo).append("\n\n");
         }
+        
+        if (found) {
+            txtRespuesta.setText(resultText.toString());
+        } else {
+            JOptionPane.showMessageDialog(this, "No se encontraron estudiantes con los criterios proporcionados.", 
+                "Información", JOptionPane.INFORMATION_MESSAGE);
+            txtRespuesta.setText("");
+        }
+    } catch (Exception ex) {
+        JOptionPane.showMessageDialog(this, "Error al consultar: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
     }
+}
     
-
-    @SuppressWarnings("unchecked")
+@SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
@@ -62,46 +134,44 @@ public ConsultaEstudiante() {
         tituloConsultae = new javax.swing.JLabel();
         JLRC = new javax.swing.JLabel();
         txtRCC = new javax.swing.JTextField();
-        jSeparator1 = new javax.swing.JSeparator();
-        jSeparator2 = new javax.swing.JSeparator();
         txtNombreC = new javax.swing.JTextField();
         JLNombreC = new javax.swing.JLabel();
-        jSeparator3 = new javax.swing.JSeparator();
-        txtApellidosC = new javax.swing.JTextField();
+        txtAnioC = new javax.swing.JTextField();
         JLApellidosC = new javax.swing.JLabel();
         JLGradoC = new javax.swing.JLabel();
         JLAnioC = new javax.swing.JLabel();
-        cmbAnioC = new javax.swing.JComboBox<>();
         cmbGradoC = new javax.swing.JComboBox<>();
         btnLimpiarE = new javax.swing.JButton();
         btnVolverCE = new javax.swing.JButton();
         btnConsultarE = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         txtRespuesta = new javax.swing.JTextArea();
+        txtApellidosC = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setLocationByPlatform(true);
         setUndecorated(true);
 
-        bgCE.setBackground(new java.awt.Color(255, 255, 255));
+        bgCE.setBackground(new java.awt.Color(51, 0, 102));
+        bgCE.setMinimumSize(new java.awt.Dimension(1012, 578));
         bgCE.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         tituloConsultae.setBackground(new java.awt.Color(0, 0, 0));
         tituloConsultae.setFont(new java.awt.Font("Dialog", 1, 48)); // NOI18N
-        tituloConsultae.setForeground(new java.awt.Color(0, 0, 0));
+        tituloConsultae.setForeground(new java.awt.Color(255, 255, 255));
         tituloConsultae.setText("Consulta Estudiante");
-        bgCE.add(tituloConsultae, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 10, -1, -1));
+        bgCE.add(tituloConsultae, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 10, -1, -1));
 
         JLRC.setBackground(new java.awt.Color(255, 255, 255));
         JLRC.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
-        JLRC.setForeground(new java.awt.Color(0, 0, 0));
+        JLRC.setForeground(new java.awt.Color(255, 255, 255));
         JLRC.setText("Resgitro civil");
-        bgCE.add(JLRC, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 100, 130, -1));
+        bgCE.add(JLRC, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 100, 130, -1));
 
         txtRCC.setBackground(new java.awt.Color(255, 255, 255));
         txtRCC.setForeground(new java.awt.Color(204, 204, 204));
         txtRCC.setText("Ingrese el registro civil");
-        txtRCC.setBorder(null);
+        txtRCC.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
         txtRCC.setCaretColor(new java.awt.Color(204, 204, 204));
         txtRCC.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mousePressed(java.awt.event.MouseEvent evt) {
@@ -113,14 +183,12 @@ public ConsultaEstudiante() {
                 txtRCCActionPerformed(evt);
             }
         });
-        bgCE.add(txtRCC, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 130, 190, -1));
-        bgCE.add(jSeparator1, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 150, 190, -1));
-        bgCE.add(jSeparator2, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 150, 190, -1));
+        bgCE.add(txtRCC, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 130, 190, -1));
 
         txtNombreC.setBackground(new java.awt.Color(255, 255, 255));
         txtNombreC.setForeground(new java.awt.Color(204, 204, 204));
         txtNombreC.setText("Ingrese el nombre");
-        txtNombreC.setBorder(null);
+        txtNombreC.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
         txtNombreC.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mousePressed(java.awt.event.MouseEvent evt) {
                 txtNombreCMousePressed(evt);
@@ -131,55 +199,48 @@ public ConsultaEstudiante() {
                 txtNombreCActionPerformed(evt);
             }
         });
-        bgCE.add(txtNombreC, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 130, 190, -1));
+        bgCE.add(txtNombreC, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 130, 190, -1));
 
         JLNombreC.setBackground(new java.awt.Color(255, 255, 255));
         JLNombreC.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
-        JLNombreC.setForeground(new java.awt.Color(0, 0, 0));
+        JLNombreC.setForeground(new java.awt.Color(255, 255, 255));
         JLNombreC.setText("Nombre");
-        bgCE.add(JLNombreC, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 100, -1, -1));
-        bgCE.add(jSeparator3, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 150, 190, -1));
+        bgCE.add(JLNombreC, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 100, -1, -1));
 
-        txtApellidosC.setBackground(new java.awt.Color(255, 255, 255));
-        txtApellidosC.setForeground(new java.awt.Color(204, 204, 204));
-        txtApellidosC.setText("Ingrese los apellidos");
-        txtApellidosC.setBorder(null);
-        txtApellidosC.addMouseListener(new java.awt.event.MouseAdapter() {
+        txtAnioC.setBackground(new java.awt.Color(255, 255, 255));
+        txtAnioC.setForeground(new java.awt.Color(204, 204, 204));
+        txtAnioC.setText("Ingrese el año");
+        txtAnioC.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        txtAnioC.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mousePressed(java.awt.event.MouseEvent evt) {
-                txtApellidosCMousePressed(evt);
+                txtAnioCMousePressed(evt);
             }
         });
-        bgCE.add(txtApellidosC, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 130, 190, -1));
+        txtAnioC.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtAnioCActionPerformed(evt);
+            }
+        });
+        bgCE.add(txtAnioC, new org.netbeans.lib.awtextra.AbsoluteConstraints(800, 130, 130, -1));
 
         JLApellidosC.setBackground(new java.awt.Color(255, 255, 255));
         JLApellidosC.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
-        JLApellidosC.setForeground(new java.awt.Color(0, 0, 0));
+        JLApellidosC.setForeground(new java.awt.Color(255, 255, 255));
         JLApellidosC.setText("Apellidos");
-        bgCE.add(JLApellidosC, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 100, -1, -1));
+        bgCE.add(JLApellidosC, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 100, -1, -1));
 
         JLGradoC.setBackground(new java.awt.Color(255, 255, 255));
         JLGradoC.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
-        JLGradoC.setForeground(new java.awt.Color(0, 0, 0));
+        JLGradoC.setForeground(new java.awt.Color(255, 255, 255));
         JLGradoC.setText("Grado");
-        bgCE.add(JLGradoC, new org.netbeans.lib.awtextra.AbsoluteConstraints(760, 100, -1, -1));
+        bgCE.add(JLGradoC, new org.netbeans.lib.awtextra.AbsoluteConstraints(690, 100, -1, -1));
 
         JLAnioC.setBackground(new java.awt.Color(255, 255, 255));
         JLAnioC.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
-        JLAnioC.setForeground(new java.awt.Color(0, 0, 0));
+        JLAnioC.setForeground(new java.awt.Color(255, 255, 255));
         JLAnioC.setText("Año");
-        bgCE.add(JLAnioC, new org.netbeans.lib.awtextra.AbsoluteConstraints(870, 100, -1, -1));
+        bgCE.add(JLAnioC, new org.netbeans.lib.awtextra.AbsoluteConstraints(800, 100, -1, -1));
 
-        cmbAnioC.setBackground(new java.awt.Color(0, 0, 0));
-        cmbAnioC.setForeground(new java.awt.Color(255, 255, 255));
-        cmbAnioC.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "-", "2020", "2021", "2022", "2023", "2024", "2025", " " }));
-        cmbAnioC.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mousePressed(java.awt.event.MouseEvent evt) {
-                cmbAnioCMousePressed(evt);
-            }
-        });
-        bgCE.add(cmbAnioC, new org.netbeans.lib.awtextra.AbsoluteConstraints(870, 120, 90, -1));
-
-        cmbGradoC.setBackground(new java.awt.Color(0, 0, 0));
         cmbGradoC.setForeground(new java.awt.Color(255, 255, 255));
         cmbGradoC.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "-", "parvulos", "jardin", "pre-jardin", "preescolar", " " }));
         cmbGradoC.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -187,15 +248,17 @@ public ConsultaEstudiante() {
                 cmbGradoCMousePressed(evt);
             }
         });
-        bgCE.add(cmbGradoC, new org.netbeans.lib.awtextra.AbsoluteConstraints(760, 120, -1, -1));
+        bgCE.add(cmbGradoC, new org.netbeans.lib.awtextra.AbsoluteConstraints(690, 130, -1, -1));
 
+        btnLimpiarE.setBackground(new java.awt.Color(255, 255, 0));
+        btnLimpiarE.setForeground(new java.awt.Color(0, 0, 0));
         btnLimpiarE.setText("Limpiar");
         btnLimpiarE.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnLimpiarEActionPerformed(evt);
             }
         });
-        bgCE.add(btnLimpiarE, new org.netbeans.lib.awtextra.AbsoluteConstraints(530, 180, 100, 40));
+        bgCE.add(btnLimpiarE, new org.netbeans.lib.awtextra.AbsoluteConstraints(520, 180, 100, 40));
 
         btnVolverCE.setText("Volver");
         btnVolverCE.addActionListener(new java.awt.event.ActionListener() {
@@ -203,8 +266,10 @@ public ConsultaEstudiante() {
                 btnVolverCEActionPerformed(evt);
             }
         });
-        bgCE.add(btnVolverCE, new org.netbeans.lib.awtextra.AbsoluteConstraints(880, 270, 90, 30));
+        bgCE.add(btnVolverCE, new org.netbeans.lib.awtextra.AbsoluteConstraints(900, 270, 90, 30));
 
+        btnConsultarE.setBackground(new java.awt.Color(255, 255, 0));
+        btnConsultarE.setForeground(new java.awt.Color(0, 0, 0));
         btnConsultarE.setText("Consultar");
         btnConsultarE.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -221,7 +286,23 @@ public ConsultaEstudiante() {
         txtRespuesta.setText("acá se deberia mostrar la URL");
         jScrollPane1.setViewportView(txtRespuesta);
 
-        bgCE.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 310, 940, 240));
+        bgCE.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 310, 990, 260));
+
+        txtApellidosC.setBackground(new java.awt.Color(255, 255, 255));
+        txtApellidosC.setForeground(new java.awt.Color(204, 204, 204));
+        txtApellidosC.setText("Ingrese los apellidos");
+        txtApellidosC.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        txtApellidosC.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                txtApellidosCMousePressed(evt);
+            }
+        });
+        txtApellidosC.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtApellidosCActionPerformed(evt);
+            }
+        });
+        bgCE.add(txtApellidosC, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 130, 190, -1));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -237,29 +318,86 @@ public ConsultaEstudiante() {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void txtNombreCActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNombreCActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtNombreCActionPerformed
-
-    private void btnLimpiarEActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimpiarEActionPerformed
-    txtRCC.setText("Ingrese el registro civil");
-    txtNombreC.setText("Ingrese el nombre");
-    txtApellidosC.setText("Ingrese los apellidos");
-    cmbAnioC.setSelectedIndex(0);
-    cmbGradoC.setSelectedIndex(0);
-    
-    }//GEN-LAST:event_btnLimpiarEActionPerformed
-
-    private void btnConsultarEActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConsultarEActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnConsultarEActionPerformed
-
     private void btnVolverCEActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVolverCEActionPerformed
-        Estudiante pantalla = new Estudiante();
+        MenuEstudiante pantalla = new MenuEstudiante();
         pantalla.setVisible(true);
         pantalla.setLocationRelativeTo(null);
         this.dispose();
     }//GEN-LAST:event_btnVolverCEActionPerformed
+
+    private void btnLimpiarEActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimpiarEActionPerformed
+    txtRCC.setText("Ingrese el registro civil");
+    txtRCC.setForeground(Color.gray);
+    txtNombreC.setText("Ingrese el nombre");
+    txtNombreC.setForeground(Color.gray);
+    txtAnioC.setText("Ingrese el año");
+    txtAnioC.setForeground(Color.gray);
+    txtApellidosC.setText("Ingrese los apellidos");
+    txtApellidosC.setForeground(Color.gray);
+    cmbGradoC.setSelectedItem("Todos");
+
+    }//GEN-LAST:event_btnLimpiarEActionPerformed
+
+    private void cmbGradoCMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_cmbGradoCMousePressed
+        if (txtRCC.getText().isEmpty()) {
+            txtRCC.setText("Ingrese el registro civil");
+            txtRCC.setForeground(Color.gray);
+        }
+        if (txtNombreC.getText().isEmpty()) {
+            txtNombreC.setText("Ingrese el nombre");
+            txtNombreC.setForeground(Color.gray);
+        }
+        if (txtAnioC.getText().isEmpty()) {
+            txtAnioC.setText("Ingrese los apellidos");
+            txtAnioC.setForeground(Color.gray);
+        }
+        if (txtApellidosC.getText().isEmpty()) {
+            txtApellidosC.setText("Ingrese los apellidos");
+            txtApellidosC.setForeground(Color.gray);
+        }
+    }//GEN-LAST:event_cmbGradoCMousePressed
+
+    private void txtAnioCMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtAnioCMousePressed
+        if (txtRCC.getText().isEmpty()) {
+            txtRCC.setText("Ingrese el registro civil");
+            txtRCC.setForeground(Color.gray);
+        }
+        if (txtNombreC.getText().isEmpty()) {
+            txtNombreC.setText("Ingrese el nombre");
+            txtNombreC.setForeground(Color.gray);
+        }
+        if (txtAnioC.getText().equals("Ingrese el año")) {
+            txtAnioC.setText("");
+            txtAnioC.setForeground(Color.black);
+        }
+        if (txtApellidosC.getText().isEmpty()) {
+            txtApellidosC.setText("Ingrese los apellidos");
+            txtApellidosC.setForeground(Color.gray);
+        }
+    }//GEN-LAST:event_txtAnioCMousePressed
+
+    private void txtNombreCActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNombreCActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtNombreCActionPerformed
+
+    private void txtNombreCMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtNombreCMousePressed
+        if (txtRCC.getText().isEmpty()) {
+            txtRCC.setText("Ingrese el registro civil");
+            txtRCC.setForeground(Color.gray);
+        }
+        if (txtNombreC.getText().equals("Ingrese el nombre")) {
+            txtNombreC.setText("");
+            txtNombreC.setForeground(Color.black);
+        }
+        if (txtAnioC.getText().isEmpty()) {
+            txtAnioC.setText("Ingrese el año");
+            txtAnioC.setForeground(Color.gray);
+        }
+        if (txtApellidosC.getText().isEmpty()) {
+            txtApellidosC.setText("Ingrese los apellidos");
+            txtApellidosC.setForeground(Color.gray);
+        }
+    }//GEN-LAST:event_txtNombreCMousePressed
 
     private void txtRCCActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtRCCActionPerformed
         // TODO add your handling code here:
@@ -274,28 +412,25 @@ public ConsultaEstudiante() {
         txtNombreC.setText("Ingrese el nombre");
         txtNombreC.setForeground(Color.gray);
     }
+    if (txtAnioC.getText().isEmpty()) {
+        txtAnioC.setText("Ingrese el año");
+        txtAnioC.setForeground(Color.gray);
+    }
     if (txtApellidosC.getText().isEmpty()) {
         txtApellidosC.setText("Ingrese los apellidos");
         txtApellidosC.setForeground(Color.gray);
     }
     }//GEN-LAST:event_txtRCCMousePressed
 
-    private void txtNombreCMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtNombreCMousePressed
-    if (txtRCC.getText().isEmpty()) {
-        txtRCC.setText("Ingrese el registro civil");
-        txtRCC.setForeground(Color.gray);
-    }
-    if (txtNombreC.getText().equals("Ingrese el nombre")) {
-        txtNombreC.setText("");
-        txtNombreC.setForeground(Color.black);
-    }
-    if (txtApellidosC.getText().isEmpty()) {
-        txtApellidosC.setText("Ingrese los apellidos");
-        txtApellidosC.setForeground(Color.gray);
-    }
-    }//GEN-LAST:event_txtNombreCMousePressed
+    private void btnConsultarEActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConsultarEActionPerformed
+        consultarEstudiante();
+    }//GEN-LAST:event_btnConsultarEActionPerformed
 
     private void txtApellidosCMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtApellidosCMousePressed
+            if (txtApellidosC.getText().equals("Ingrese los apellidos")) {
+        txtApellidosC.setText("");
+        txtApellidosC.setForeground(Color.black);
+    }
     if (txtRCC.getText().isEmpty()) {
         txtRCC.setText("Ingrese el registro civil");
         txtRCC.setForeground(Color.gray);
@@ -304,13 +439,36 @@ public ConsultaEstudiante() {
         txtNombreC.setText("Ingrese el nombre");
         txtNombreC.setForeground(Color.gray);
     }
+    if (txtAnioC.getText().isEmpty()) {
+        txtAnioC.setText("Ingrese el año");
+        txtAnioC.setForeground(Color.gray);
+    }
+    }//GEN-LAST:event_txtApellidosCMousePressed
+
+    private void txtAnioCActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtAnioCActionPerformed
+    if (txtAnioC.getText().equals("Ingrese el año")) {
+        txtAnioC.setText("");
+        txtAnioC.setForeground(Color.black);
+    }
+    if (txtRCC.getText().isEmpty()) {
+        txtRCC.setText("Ingrese el registro civil");
+        txtRCC.setForeground(Color.gray);
+    }
+    if (txtNombreC.getText().isEmpty()) {
+        txtNombreC.setText("Ingrese el nombre");
+        txtNombreC.setForeground(Color.gray);
+    }
+    if (txtApellidosC.getText().isEmpty()) {
+        txtApellidosC.setText("Ingrese los apellidos");
+        txtApellidosC.setForeground(Color.gray);
+    }
+    }//GEN-LAST:event_txtAnioCActionPerformed
+
+    private void txtApellidosCActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtApellidosCActionPerformed
     if (txtApellidosC.getText().equals("Ingrese los apellidos")) {
         txtApellidosC.setText("");
         txtApellidosC.setForeground(Color.black);
     }
-    }//GEN-LAST:event_txtApellidosCMousePressed
-
-    private void cmbGradoCMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_cmbGradoCMousePressed
     if (txtRCC.getText().isEmpty()) {
         txtRCC.setText("Ingrese el registro civil");
         txtRCC.setForeground(Color.gray);
@@ -319,26 +477,11 @@ public ConsultaEstudiante() {
         txtNombreC.setText("Ingrese el nombre");
         txtNombreC.setForeground(Color.gray);
     }
-    if (txtApellidosC.getText().isEmpty()) {
-        txtApellidosC.setText("Ingrese los apellidos");
-        txtApellidosC.setForeground(Color.gray);
+    if (txtAnioC.getText().isEmpty()) {
+        txtAnioC.setText("Ingrese el año");
+        txtAnioC.setForeground(Color.gray);
     }
-    }//GEN-LAST:event_cmbGradoCMousePressed
-
-    private void cmbAnioCMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_cmbAnioCMousePressed
-     if (txtRCC.getText().isEmpty()) {
-        txtRCC.setText("Ingrese el registro civil");
-        txtRCC.setForeground(Color.gray);
-    }
-    if (txtNombreC.getText().isEmpty()) {
-        txtNombreC.setText("Ingrese el nombre");
-        txtNombreC.setForeground(Color.gray);
-    }
-    if (txtApellidosC.getText().isEmpty()) {
-        txtApellidosC.setText("Ingrese los apellidos");
-        txtApellidosC.setForeground(Color.gray);
-    }
-    }//GEN-LAST:event_cmbAnioCMousePressed
+    }//GEN-LAST:event_txtApellidosCActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -351,13 +494,10 @@ public ConsultaEstudiante() {
     private javax.swing.JButton btnConsultarE;
     private javax.swing.JButton btnLimpiarE;
     private javax.swing.JButton btnVolverCE;
-    private javax.swing.JComboBox<String> cmbAnioC;
     private javax.swing.JComboBox<String> cmbGradoC;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JSeparator jSeparator1;
-    private javax.swing.JSeparator jSeparator2;
-    private javax.swing.JSeparator jSeparator3;
     private javax.swing.JLabel tituloConsultae;
+    private javax.swing.JTextField txtAnioC;
     private javax.swing.JTextField txtApellidosC;
     private javax.swing.JTextField txtNombreC;
     private javax.swing.JTextField txtRCC;

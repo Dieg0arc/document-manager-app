@@ -308,7 +308,7 @@ private void configurarValidaciones() {
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
 
-        Estudiante acu = new Estudiante();
+        MenuEstudiante acu = new MenuEstudiante();
         acu.setVisible(true);
         acu.setLocationRelativeTo(null);
         this.dispose(); // Cierra la ventana actual
