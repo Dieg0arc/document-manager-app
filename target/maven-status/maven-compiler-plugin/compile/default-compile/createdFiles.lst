@@ -3,6 +3,7 @@ com\mycompany\portaldelsaber\logica\Controladora.class
 com\mycompany\portaldelsaber\PortalDelSaber.class
 com\mycompany\portaldelsaber\igu\CargaDatosDocentes$7.class
 com\mycompany\portaldelsaber\igu\ConsultaEstudiante$6.class
+com\mycompany\portaldelsaber\igu\ConsultaEstudiante$URLClickListener.class
 com\mycompany\portaldelsaber\igu\CargaDatosAcudiente$8.class
 com\mycompany\portaldelsaber\igu\Docente$3.class
 com\mycompany\portaldelsaber\igu\CargaDatosAcudiente$15.class
@@ -57,6 +58,7 @@ com\mycompany\portaldelsaber\igu\CargaDatosDocentes$1.class
 com\mycompany\portaldelsaber\persistencia\DocenteJpaController.class
 com\mycompany\portaldelsaber\igu\CargaDatosEstudiantes$1.class
 com\mycompany\portaldelsaber\igu\ConsultaEstudiante$11.class
+com\mycompany\portaldelsaber\igu\ConsultaEstudiante$14.class
 com\mycompany\portaldelsaber\igu\CargaDatosAcudiente$10.class
 com\mycompany\portaldelsaber\igu\CargaDatosDocentes$9.class
 com\mycompany\portaldelsaber\igu\ConsultaEstudiante$7.class
