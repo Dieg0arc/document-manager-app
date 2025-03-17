@@ -13,15 +13,16 @@ import com.mycompany.portaldelsaber.persistencia.ConexionBD;
 public class ConsultaEstudiante extends javax.swing.JFrame {
     
 public ConsultaEstudiante() {
-        initComponents();
-        btnConsultarE.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                consultarEstudiante();
-            }
-        });
-    }
-private void consultarEstudiante(){
+    initComponents();
+    btnConsultarE.addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            consultarEstudiante();
+        }
+    });
+}
+
+private void consultarEstudiante() {
     String registroCivil = txtRCC.getText().trim();
     String nombre = txtNombreC.getText().trim();
     String apellidos = txtApellidosC.getText().trim();
@@ -82,41 +83,123 @@ private void consultarEstudiante(){
         // Execute query
         ResultSet rs = ps.executeQuery();
         
-        boolean found = false;
-        StringBuilder resultText = new StringBuilder();
+        int resultCount = 0;
         
+        // Count the results before processing
         while (rs.next()) {
-            found = true;
-            
-            // Set values to form fields for the first result
-            if (resultText.length() == 0) {
+            resultCount++;
+        }
+        
+        // Reset the result set to start from the beginning
+        rs = ps.executeQuery();
+        
+        if (resultCount == 1) {
+            // If only one result, display it directly as in the second code
+            if (rs.next()) {
                 txtNombreC.setText(rs.getString("nombre"));
                 txtApellidosC.setText(rs.getString("apellidos"));
-                txtAnioC.setText(rs.getString("anio"));
+                
                 // Set the grade in the combo box
+                String foundGrado = rs.getString("grado");
                 for (int i = 0; i < cmbGradoC.getItemCount(); i++) {
-                    if (cmbGradoC.getItemAt(i).equals(rs.getString("grado"))) {
+                    if (cmbGradoC.getItemAt(i).equals(foundGrado)) {
                         cmbGradoC.setSelectedIndex(i);
                         break;
                     }
                 }
+                
+                txtAnioC.setText(rs.getString("anio"));
+                
+                // Get the document path as a clickable URL
+                String rc = rs.getString("registro_civil");
+                String rutaArchivo = "C:\\Users\\Asus\\Desktop\\PruebasPS\\" + rs.getString("anio") + "\\estudiante\\" + foundGrado + "\\" + rc + ".pdf";
+                txtRespuesta.setText(rutaArchivo);
+                
+                // Make the text area look like a clickable URL
+                txtRespuesta.setForeground(Color.BLUE);
+                txtRespuesta.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+                
+                // Add mouse listener to handle clicks on the URL
+                if (!txtRespuesta.getMouseListeners().getClass().getName().contains("URLClickListener")) {
+                    txtRespuesta.addMouseListener(new URLClickListener());
+                }
+            }
+        } else if (resultCount > 1) {
+            // Multiple results found, show selection dialog
+            Object[][] data = new Object[resultCount][5];
+            String[] columnNames = {"Registro Civil", "Nombre", "Apellidos", "Grado", "Año"};
+            
+            int index = 0;
+            while (rs.next()) {
+                data[index][0] = rs.getString("registro_civil");
+                data[index][1] = rs.getString("nombre");
+                data[index][2] = rs.getString("apellidos");
+                data[index][3] = rs.getString("grado");
+                data[index][4] = rs.getString("anio");
+                index++;
             }
             
-            // Get document path for each student
-            String rc = rs.getString("registro_civil");
-            String studentGrado = rs.getString("grado");
-            String studentAnio = rs.getString("anio");
-            String rutaArchivo = "C:/" + studentAnio + "/estudiante/" + studentGrado + "/" + rc + ".pdf";
+            // Create table model
+            javax.swing.table.DefaultTableModel model = new javax.swing.table.DefaultTableModel(data, columnNames) {
+                @Override
+                public boolean isCellEditable(int row, int column) {
+                    return false; // Make cells non-editable
+                }
+            };
             
-            // Add result to the text area
-            resultText.append("Estudiante: ").append(rs.getString("nombre")).append(" ")
-                     .append(rs.getString("apellidos")).append(" (RC: ").append(rc)
-                     .append(") - Archivo: ").append(rutaArchivo).append("\n\n");
-        }
-        
-        if (found) {
-            txtRespuesta.setText(resultText.toString());
+            // Create table and scrollpane
+            javax.swing.JTable table = new javax.swing.JTable(model);
+            javax.swing.JScrollPane scrollPane = new javax.swing.JScrollPane(table);
+            
+            // Show dialog with table
+            Object[] options = {"Seleccionar", "Cancelar"};
+            int result = JOptionPane.showOptionDialog(
+                this,
+                scrollPane,
+                "Seleccione un estudiante (" + resultCount + " resultados)",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                options,
+                options[0]
+            );
+            
+            // If user selected an entry
+            if (result == JOptionPane.YES_OPTION && table.getSelectedRow() != -1) {
+                int selectedRow = table.getSelectedRow();
+                
+                // Set the form fields
+                txtRCC.setText((String) data[selectedRow][0]);
+                txtNombreC.setText((String) data[selectedRow][1]);
+                txtApellidosC.setText((String) data[selectedRow][2]);
+                
+                // Set the grade in the combo box
+                String selectedGrado = (String) data[selectedRow][3];
+                for (int i = 0; i < cmbGradoC.getItemCount(); i++) {
+                    if (cmbGradoC.getItemAt(i).equals(selectedGrado)) {
+                        cmbGradoC.setSelectedIndex(i);
+                        break;
+                    }
+                }
+                
+                txtAnioC.setText((String) data[selectedRow][4]);
+                
+                // Generate and display file path
+                String rc = (String) data[selectedRow][0];
+                String rutaArchivo = "C:\\Users\\Asus\\Desktop\\PruebasPS\\" + data[selectedRow][4] + "\\estudiante\\" + data[selectedRow][3] + "\\" + rc + ".pdf";
+                txtRespuesta.setText(rutaArchivo);
+                
+                // Make the text area look like a clickable URL
+                txtRespuesta.setForeground(Color.BLUE);
+                txtRespuesta.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+                
+                // Add mouse listener to handle clicks on the URL
+                if (!txtRespuesta.getMouseListeners().getClass().getName().contains("URLClickListener")) {
+                    txtRespuesta.addMouseListener(new URLClickListener());
+                }
+            }
         } else {
+            // No results
             JOptionPane.showMessageDialog(this, "No se encontraron estudiantes con los criterios proporcionados.", 
                 "Información", JOptionPane.INFORMATION_MESSAGE);
             txtRespuesta.setText("");
@@ -125,6 +208,24 @@ private void consultarEstudiante(){
         JOptionPane.showMessageDialog(this, "Error al consultar: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
     }
 }
+
+// Custom MouseListener class to handle clicks on the URL in the text area
+private class URLClickListener extends java.awt.event.MouseAdapter {
+    @Override
+    public void mouseClicked(java.awt.event.MouseEvent evt) {
+        if (evt.getClickCount() > 0) {
+            String url = txtRespuesta.getText().trim();
+            try {
+                java.awt.Desktop.getDesktop().open(new java.io.File(url));
+            } catch (java.io.IOException ex) {
+                JOptionPane.showMessageDialog(null, "Error al abrir el archivo: " + ex.getMessage(), 
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+}
+
+
     
 @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
