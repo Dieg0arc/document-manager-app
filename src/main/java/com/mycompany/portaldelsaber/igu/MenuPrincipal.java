@@ -7,9 +7,9 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import javax.swing.JOptionPane;
 
-public class Formulario extends javax.swing.JFrame {
+public class MenuPrincipal extends javax.swing.JFrame {
 
-    public Formulario() {
+    public MenuPrincipal() {
         initComponents();
  
     }
@@ -142,7 +142,7 @@ this.dispose();
     }//GEN-LAST:event_btnSalirAppActionPerformed
 
     private void btnDocenteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDocenteActionPerformed
-Docente docente = new Docente();
+MenuDocente docente = new MenuDocente();
 docente.setVisible(true);
 docente.setLocationRelativeTo(null);
 this.dispose();

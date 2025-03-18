@@ -20,10 +20,10 @@ public class Estudiante implements Serializable {
     
     public Estudiante() {}
 
-    public Estudiante(int id_Estudiante, String nombre,  String apellido, String tarjetaIdentidad, String grado, String anio, String observaciones) {
+    public Estudiante(int id_Estudiante, String nombre,  String apellido, String registrocivil, String grado, String anio, String observaciones) {
         this.id_Estudiante = id_Estudiante;
         this.nombre = nombre;
-        this.registro_civil = tarjetaIdentidad;
+        this.registro_civil = registrocivil;
         this.grado = grado;
         this.anio = anio;
 

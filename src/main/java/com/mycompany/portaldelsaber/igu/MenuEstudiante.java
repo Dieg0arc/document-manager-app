@@ -113,7 +113,7 @@ public class MenuEstudiante extends javax.swing.JFrame {
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
                  
-        Formulario form = new Formulario();
+        MenuPrincipal form = new MenuPrincipal();
         form.setVisible(true);
         form.setLocationRelativeTo(null);
         this.dispose(); // Cierra la ventana actual
