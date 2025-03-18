@@ -23,10 +23,10 @@ public class ConexionBD {
     }
 
     // Método para insertar estudiantes
-    public static boolean insertarEstudiante(String tarjetaIdentidad, String nombre, String apellidos, String grado, int anio) {
-        String sql = "INSERT INTO estudiantes (tarjeta_identidad, nombre, apellidos, grado, anio) VALUES (?, ?, ?, ?, ?)";
+    public static boolean insertarEstudiante(String registrocivil, String nombre, String apellidos, String grado, int anio) {
+        String sql = "INSERT INTO estudiantes (registro_civil, nombre, apellidos, grado, anio) VALUES (?, ?, ?, ?, ?)";
         try (Connection conexion = conectar(); PreparedStatement ps = conexion.prepareStatement(sql)) {
-            ps.setString(1, tarjetaIdentidad);
+            ps.setString(1, registrocivil);
             ps.setString(2, nombre);
             ps.setString(3, apellidos);
             ps.setString(4, grado);
@@ -41,14 +41,14 @@ public class ConexionBD {
     }
 
     // Método para insertar docentes
-    public static boolean insertarDocente(String cedula, String nombre, String apellidos, int anio, String estado) {
-        String sql = "INSERT INTO docentes (cedula, nombre, apellidos, anio, estado) VALUES (?, ?, ?, ?, ?)";
+    public static boolean insertarDocente(String cedula, String nombre, String apellidos, String estado, int anio) {
+        String sql = "INSERT INTO docentes (cedula, nombre, apellidos, estado, anio) VALUES (?, ?, ?, ?, ?)";
         try (Connection conexion = conectar(); PreparedStatement ps = conexion.prepareStatement(sql)) {
             ps.setString(1, cedula);
             ps.setString(2, nombre);
             ps.setString(3, apellidos);
-            ps.setInt(4, anio);
-            ps.setString(5, estado);
+            ps.setString(4, estado);
+            ps.setInt(5, anio);
             ps.executeUpdate();
             System.out.println("✅ Docente insertado correctamente.");
             return true;

@@ -129,7 +129,6 @@
                       <EmptySpace min="-2" pref="51" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Component id="jLabel20" min="-2" pref="41" max="-2" attributes="0"/>
-                          <Component id="cmbAnioDocente" min="-2" pref="100" max="-2" attributes="0"/>
                           <Group type="103" alignment="0" groupAlignment="0" max="-2" attributes="0">
                               <Component id="jLabel21" alignment="0" min="-2" pref="41" max="-2" attributes="0"/>
                               <Component id="jLabel22" alignment="0" min="-2" pref="54" max="-2" attributes="0"/>
@@ -138,6 +137,7 @@
                               <Component id="txtNombreDocente" alignment="0" pref="326" max="32767" attributes="0"/>
                               <Component id="txtCC" alignment="0" max="32767" attributes="0"/>
                               <Component id="txtApellidoDocente" alignment="0" max="32767" attributes="0"/>
+                              <Component id="txtAnio" alignment="0" max="32767" attributes="0"/>
                           </Group>
                           <Component id="cmbEstado" alignment="0" min="-2" pref="100" max="-2" attributes="0"/>
                       </Group>
@@ -162,9 +162,9 @@
                       <Component id="txtApellidoDocente" min="-2" max="-2" attributes="0"/>
                       <EmptySpace min="-2" pref="18" max="-2" attributes="0"/>
                       <Component id="jLabel21" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="20" max="-2" attributes="0"/>
+                      <Component id="txtAnio" min="-2" max="-2" attributes="0"/>
                       <EmptySpace type="separate" max="-2" attributes="0"/>
-                      <Component id="cmbAnioDocente" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace min="-2" pref="18" max="-2" attributes="0"/>
                       <Component id="jLabel20" min="-2" max="-2" attributes="0"/>
                       <EmptySpace type="separate" max="-2" attributes="0"/>
                       <Component id="cmbEstado" min="-2" max="-2" attributes="0"/>
@@ -218,33 +218,17 @@
                 <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
               </AuxValues>
             </Component>
-            <Component class="javax.swing.JComboBox" name="cmbAnioDocente">
-              <Properties>
-                <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-                  <StringArray count="7">
-                    <StringItem index="0" value="-"/>
-                    <StringItem index="1" value="2020"/>
-                    <StringItem index="2" value="2021"/>
-                    <StringItem index="3" value="2022"/>
-                    <StringItem index="4" value="2023"/>
-                    <StringItem index="5" value="2024"/>
-                    <StringItem index="6" value="2025"/>
-                  </StringArray>
-                </Property>
-              </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cmbAnioDocenteActionPerformed"/>
-              </Events>
-              <AuxValues>
-                <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
-              </AuxValues>
-            </Component>
             <Component class="javax.swing.JTextField" name="txtApellidoDocente">
             </Component>
             <Component class="javax.swing.JLabel" name="jLabel22">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Apellidos"/>
               </Properties>
+            </Component>
+            <Component class="javax.swing.JTextField" name="txtAnio">
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtAnioActionPerformed"/>
+              </Events>
             </Component>
           </SubComponents>
         </Container>

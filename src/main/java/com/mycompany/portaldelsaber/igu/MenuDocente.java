@@ -2,9 +2,9 @@
 package com.mycompany.portaldelsaber.igu;
 
 
-public class Docente extends javax.swing.JFrame {
+public class MenuDocente extends javax.swing.JFrame {
 
-    public Docente() {
+    public MenuDocente() {
         initComponents();
     }
 
@@ -112,7 +112,7 @@ public class Docente extends javax.swing.JFrame {
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
 
-        Formulario form = new Formulario();
+        MenuPrincipal form = new MenuPrincipal();
         form.setVisible(true);
         form.setLocationRelativeTo(null);
         this.dispose(); // Cierra la ventana actual
@@ -126,7 +126,10 @@ public class Docente extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-
+        ConsultaDocentes filtro = new ConsultaDocentes();
+        filtro.setVisible(true);
+        filtro.setLocationRelativeTo(null);
+        this.dispose();
     }//GEN-LAST:event_jButton1ActionPerformed
 
 

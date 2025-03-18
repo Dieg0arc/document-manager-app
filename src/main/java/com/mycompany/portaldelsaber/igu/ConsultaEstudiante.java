@@ -1,4 +1,3 @@
-
 package com.mycompany.portaldelsaber.igu;
 
 import java.awt.Color;
@@ -29,7 +28,7 @@ private void consultarEstudiante() {
     String grado = cmbGradoC.getSelectedItem().toString();
     String anio = txtAnioC.getText().trim();
     
-    // Verify if at least one field has valid search data
+    // Verificar si hay al menos un criterio de búsqueda válido
     if ((registroCivil.isEmpty() || registroCivil.equals("Ingrese el registro civil")) &&
         (nombre.isEmpty() || nombre.equals("Ingrese el nombre")) &&
         (apellidos.isEmpty() || apellidos.equals("Ingrese los apellidos")) &&
@@ -40,13 +39,13 @@ private void consultarEstudiante() {
     }
 
     try (Connection con = ConexionBD.conectar()) {
-        // Build dynamic SQL query based on provided fields
+        // Construir consulta SQL dinámica
         StringBuilder sqlBuilder = new StringBuilder("SELECT * FROM estudiantes WHERE 1=1");
         
-        // Prepare parameters list
+        // Preparar lista de parámetros
         java.util.List<Object> params = new java.util.ArrayList<>();
         
-        // Add conditions based on provided fields
+        // Añadir condiciones basadas en los campos proporcionados
         if (!registroCivil.isEmpty() && !registroCivil.equals("Ingrese el registro civil")) {
             sqlBuilder.append(" AND registro_civil = ?");
             params.add(registroCivil);
@@ -72,35 +71,48 @@ private void consultarEstudiante() {
             params.add(anio);
         }
         
-        // Prepare statement with dynamic query
+        // Preparar statement con consulta dinámica
         PreparedStatement ps = con.prepareStatement(sqlBuilder.toString());
         
-        // Set parameters
+        // Establecer parámetros
         for (int i = 0; i < params.size(); i++) {
             ps.setObject(i + 1, params.get(i));
         }
         
-        // Execute query
+        // Ejecutar consulta
         ResultSet rs = ps.executeQuery();
         
         int resultCount = 0;
         
-        // Count the results before processing
+        // Contar resultados antes de procesarlos
         while (rs.next()) {
             resultCount++;
         }
         
-        // Reset the result set to start from the beginning
+        // Resetear el resultset para volver al inicio
         rs = ps.executeQuery();
         
-        if (resultCount == 1) {
-            // If only one result, display it directly as in the second code
+        if (resultCount == 0) {
+            // Sin resultados
+            JOptionPane.showMessageDialog(this, "No se encontraron estudiantes con los criterios proporcionados.", 
+                "Información", JOptionPane.INFORMATION_MESSAGE);
+            txtRespuesta.setText("");
+            return;
+        } else if (resultCount == 1) {
+            // Si hay EXACTAMENTE UN RESULTADO, mostrar directamente
             if (rs.next()) {
-                txtNombreC.setText(rs.getString("nombre"));
-                txtApellidosC.setText(rs.getString("apellidos"));
-                
-                // Set the grade in the combo box
+                String rc = rs.getString("registro_civil");
                 String foundGrado = rs.getString("grado");
+                String foundAnio = rs.getString("anio");
+                String foundNombre = rs.getString("nombre");
+                String foundApellidos = rs.getString("apellidos");
+                
+                // Actualizar los campos del formulario
+                txtRCC.setText(rc);
+                txtNombreC.setText(foundNombre);
+                txtApellidosC.setText(foundApellidos);
+                
+                // Establecer el grado en el combo box
                 for (int i = 0; i < cmbGradoC.getItemCount(); i++) {
                     if (cmbGradoC.getItemAt(i).equals(foundGrado)) {
                         cmbGradoC.setSelectedIndex(i);
@@ -108,24 +120,27 @@ private void consultarEstudiante() {
                     }
                 }
                 
-                txtAnioC.setText(rs.getString("anio"));
+                txtAnioC.setText(foundAnio);
                 
-                // Get the document path as a clickable URL
-                String rc = rs.getString("registro_civil");
-                String rutaArchivo = "C:\\Users\\Asus\\Desktop\\PruebasPS\\" + rs.getString("anio") + "\\estudiante\\" + foundGrado + "\\" + rc + ".pdf";
+                // Generar y mostrar la ruta del archivo
+                String rutaArchivo = "C:\\Users\\Asus\\Desktop\\PruebasPS\\" + foundAnio + 
+                                     "\\estudiante\\" + foundGrado + "\\" + rc + ".pdf";
                 txtRespuesta.setText(rutaArchivo);
                 
-                // Make the text area look like a clickable URL
+                // Hacer que el área de texto se vea como un URL cliqueable
                 txtRespuesta.setForeground(Color.BLUE);
                 txtRespuesta.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
                 
-                // Add mouse listener to handle clicks on the URL
-                if (!txtRespuesta.getMouseListeners().getClass().getName().contains("URLClickListener")) {
-                    txtRespuesta.addMouseListener(new URLClickListener());
+                // Agregar listener para manejar clics en el URL
+                for (java.awt.event.MouseListener ml : txtRespuesta.getMouseListeners()) {
+                    if (ml instanceof URLClickListener || ml instanceof MultipleURLClickListener) {
+                        txtRespuesta.removeMouseListener(ml);
+                    }
                 }
+                txtRespuesta.addMouseListener(new URLClickListener());
             }
-        } else if (resultCount > 1) {
-            // Multiple results found, show selection dialog
+        } else {
+            // MÚLTIPLES RESULTADOS: mostrar tabla para todos los casos
             Object[][] data = new Object[resultCount][5];
             String[] columnNames = {"Registro Civil", "Nombre", "Apellidos", "Grado", "Año"};
             
@@ -139,19 +154,19 @@ private void consultarEstudiante() {
                 index++;
             }
             
-            // Create table model
+            // Crear modelo de tabla
             javax.swing.table.DefaultTableModel model = new javax.swing.table.DefaultTableModel(data, columnNames) {
                 @Override
                 public boolean isCellEditable(int row, int column) {
-                    return false; // Make cells non-editable
+                    return false; // Hacer que las celdas no sean editables
                 }
             };
             
-            // Create table and scrollpane
+            // Crear tabla y scrollpane
             javax.swing.JTable table = new javax.swing.JTable(model);
             javax.swing.JScrollPane scrollPane = new javax.swing.JScrollPane(table);
             
-            // Show dialog with table
+            // Mostrar diálogo con tabla
             Object[] options = {"Seleccionar", "Cancelar"};
             int result = JOptionPane.showOptionDialog(
                 this,
@@ -164,16 +179,16 @@ private void consultarEstudiante() {
                 options[0]
             );
             
-            // If user selected an entry
+            // Si el usuario seleccionó una entrada
             if (result == JOptionPane.YES_OPTION && table.getSelectedRow() != -1) {
                 int selectedRow = table.getSelectedRow();
                 
-                // Set the form fields
+                // Establecer los campos del formulario
                 txtRCC.setText((String) data[selectedRow][0]);
                 txtNombreC.setText((String) data[selectedRow][1]);
                 txtApellidosC.setText((String) data[selectedRow][2]);
                 
-                // Set the grade in the combo box
+                // Establecer el grado en el combo box
                 String selectedGrado = (String) data[selectedRow][3];
                 for (int i = 0; i < cmbGradoC.getItemCount(); i++) {
                     if (cmbGradoC.getItemAt(i).equals(selectedGrado)) {
@@ -184,32 +199,31 @@ private void consultarEstudiante() {
                 
                 txtAnioC.setText((String) data[selectedRow][4]);
                 
-                // Generate and display file path
+                // Generar y mostrar la ruta del archivo
                 String rc = (String) data[selectedRow][0];
-                String rutaArchivo = "C:\\Users\\Asus\\Desktop\\PruebasPS\\" + data[selectedRow][4] + "\\estudiante\\" + data[selectedRow][3] + "\\" + rc + ".pdf";
+                String rutaArchivo = "C:\\Users\\Asus\\Desktop\\PruebasPS\\" + data[selectedRow][4] + 
+                                     "\\estudiante\\" + data[selectedRow][3] + "\\" + rc + ".pdf";
                 txtRespuesta.setText(rutaArchivo);
                 
-                // Make the text area look like a clickable URL
+                // Hacer que el área de texto se vea como un URL cliqueable
                 txtRespuesta.setForeground(Color.BLUE);
                 txtRespuesta.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
                 
-                // Add mouse listener to handle clicks on the URL
-                if (!txtRespuesta.getMouseListeners().getClass().getName().contains("URLClickListener")) {
-                    txtRespuesta.addMouseListener(new URLClickListener());
+                // Agregar listener para manejar clics en el URL
+                for (java.awt.event.MouseListener ml : txtRespuesta.getMouseListeners()) {
+                    if (ml instanceof URLClickListener || ml instanceof MultipleURLClickListener) {
+                        txtRespuesta.removeMouseListener(ml);
+                    }
                 }
+                txtRespuesta.addMouseListener(new URLClickListener());
             }
-        } else {
-            // No results
-            JOptionPane.showMessageDialog(this, "No se encontraron estudiantes con los criterios proporcionados.", 
-                "Información", JOptionPane.INFORMATION_MESSAGE);
-            txtRespuesta.setText("");
         }
     } catch (Exception ex) {
         JOptionPane.showMessageDialog(this, "Error al consultar: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
     }
 }
 
-// Custom MouseListener class to handle clicks on the URL in the text area
+// Listener para un solo URL
 private class URLClickListener extends java.awt.event.MouseAdapter {
     @Override
     public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -225,7 +239,54 @@ private class URLClickListener extends java.awt.event.MouseAdapter {
     }
 }
 
-
+// Nuevo listener para manejar múltiples URLs en el texto
+private class MultipleURLClickListener extends java.awt.event.MouseAdapter {
+    @Override
+    public void mouseClicked(java.awt.event.MouseEvent evt) {
+        if (evt.getClickCount() > 0) {
+            try {
+                // Obtenemos el texto completo
+                String text = txtRespuesta.getText();
+                
+                // Encontramos la línea donde se hizo clic
+                int caretPosition = txtRespuesta.viewToModel2D(evt.getPoint());
+                int lineStart = 0;
+                int lineEnd = text.length();
+                
+                // Buscamos el inicio de la línea
+                for (int i = caretPosition; i >= 0; i--) {
+                    if (text.charAt(i) == '\n') {
+                        lineStart = i + 1;
+                        break;
+                    }
+                }
+                
+                // Buscamos el final de la línea
+                for (int i = caretPosition; i < text.length(); i++) {
+                    if (text.charAt(i) == '\n') {
+                        lineEnd = i;
+                        break;
+                    }
+                }
+                
+                // Obtenemos la línea donde se hizo clic
+                String line = text.substring(lineStart, lineEnd).trim();
+                
+                // Extraemos la ruta del archivo
+                if (line.contains("C:\\")) {
+                    int index = line.indexOf("C:\\");
+                    String filePath = line.substring(index).trim();
+                    
+                    // Abrimos el archivo
+                    java.awt.Desktop.getDesktop().open(new java.io.File(filePath));
+                }
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(null, "Error al abrir el archivo: " + ex.getMessage(), 
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+}
     
 @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -342,7 +403,7 @@ private class URLClickListener extends java.awt.event.MouseAdapter {
         JLAnioC.setText("Año");
         bgCE.add(JLAnioC, new org.netbeans.lib.awtextra.AbsoluteConstraints(800, 100, -1, -1));
 
-        cmbGradoC.setForeground(new java.awt.Color(255, 255, 255));
+        cmbGradoC.setForeground(new java.awt.Color(0, 0, 0));
         cmbGradoC.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "-", "parvulos", "jardin", "pre-jardin", "preescolar", " " }));
         cmbGradoC.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mousePressed(java.awt.event.MouseEvent evt) {
@@ -435,7 +496,9 @@ private class URLClickListener extends java.awt.event.MouseAdapter {
     txtAnioC.setForeground(Color.gray);
     txtApellidosC.setText("Ingrese los apellidos");
     txtApellidosC.setForeground(Color.gray);
-    cmbGradoC.setSelectedItem("Todos");
+    cmbGradoC.setSelectedIndex(0);
+    txtRespuesta.setText("agrega información en los campos para poder filtrar");
+    txtRespuesta.setForeground(Color.gray);
 
     }//GEN-LAST:event_btnLimpiarEActionPerformed
 
