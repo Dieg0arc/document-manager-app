@@ -72,9 +72,9 @@ private void configurarValidaciones() {
         txtNombreDocente = new javax.swing.JTextField();
         txtCC = new javax.swing.JTextField();
         cmbEstado = new javax.swing.JComboBox<>();
-        cmbAnioDocente = new javax.swing.JComboBox<>();
         txtApellidoDocente = new javax.swing.JTextField();
         jLabel22 = new javax.swing.JLabel();
+        txtAnio = new javax.swing.JTextField();
         jButton3 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -133,14 +133,13 @@ private void configurarValidaciones() {
             }
         });
 
-        cmbAnioDocente.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "-", "2020", "2021", "2022", "2023", "2024", "2025" }));
-        cmbAnioDocente.addActionListener(new java.awt.event.ActionListener() {
+        jLabel22.setText("Apellidos");
+
+        txtAnio.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmbAnioDocenteActionPerformed(evt);
+                txtAnioActionPerformed(evt);
             }
         });
-
-        jLabel22.setText("Apellidos");
 
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
@@ -150,7 +149,6 @@ private void configurarValidaciones() {
                 .addGap(51, 51, 51)
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel20, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(cmbAnioDocente, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                         .addComponent(jLabel21, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(jLabel22, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -158,7 +156,8 @@ private void configurarValidaciones() {
                         .addComponent(jLabel18, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(txtNombreDocente, javax.swing.GroupLayout.DEFAULT_SIZE, 326, Short.MAX_VALUE)
                         .addComponent(txtCC)
-                        .addComponent(txtApellidoDocente))
+                        .addComponent(txtApellidoDocente)
+                        .addComponent(txtAnio))
                     .addComponent(cmbEstado, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(139, Short.MAX_VALUE))
         );
@@ -179,8 +178,8 @@ private void configurarValidaciones() {
                 .addComponent(txtApellidoDocente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(jLabel21)
-                .addGap(18, 18, 18)
-                .addComponent(cmbAnioDocente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(20, 20, 20)
+                .addComponent(txtAnio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(jLabel20)
                 .addGap(18, 18, 18)
@@ -217,7 +216,7 @@ private void configurarValidaciones() {
         String cedula = txtCC.getText();
         String nombre = txtNombreDocente.getText();
         String apellidos = txtApellidoDocente.getText();
-        String anio = cmbAnioDocente.getSelectedItem().toString();
+        String anio = txtAnio.getText();
         String estado = cmbEstado.getSelectedItem().toString();
         
         if (cedula.isEmpty() || nombre.isEmpty() || apellidos.isEmpty() || anio.equals("-") || estado.equals("-")) {
@@ -253,7 +252,7 @@ private void configurarValidaciones() {
         txtApellidoDocente.setText("");
         txtNombreDocente.setText("");
         txtCC.setText("");
-        cmbAnioDocente.setSelectedIndex(0);
+        txtAnio.setText("");
         cmbEstado.setSelectedIndex(0);
         
     }//GEN-LAST:event_btnLimpiarDocenteActionPerformed
@@ -267,23 +266,22 @@ private void configurarValidaciones() {
         // TODO add your handling code here:
     }//GEN-LAST:event_cmbEstadoActionPerformed
 
-    private void cmbAnioDocenteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbAnioDocenteActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_cmbAnioDocenteActionPerformed
-
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
 
-        Formulario form = new Formulario();
+        MenuPrincipal form = new MenuPrincipal();
         form.setVisible(true);
         form.setLocationRelativeTo(null);
         this.dispose(); // Cierra la ventana actual
     }//GEN-LAST:event_jButton3ActionPerformed
 
+    private void txtAnioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtAnioActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtAnioActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnGuardarDocente;
     private javax.swing.JButton btnLimpiarDocente;
-    private javax.swing.JComboBox<String> cmbAnioDocente;
     private javax.swing.JComboBox<String> cmbEstado;
     private javax.swing.JButton jButton3;
     private javax.swing.JLabel jLabel1;
@@ -295,6 +293,7 @@ private void configurarValidaciones() {
     private javax.swing.JLabel jLabel6;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel5;
+    private javax.swing.JTextField txtAnio;
     private javax.swing.JTextField txtApellidoDocente;
     private javax.swing.JTextField txtCC;
     private javax.swing.JTextField txtNombreDocente;
