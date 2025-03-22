@@ -57,4 +57,23 @@ public class ConexionBD {
             return false;
         }
     }
+    
+    // Método para insertar acudientes
+public static boolean insertarAcudiente(String cedula, String nombre, String apellidos, String telefono, String parentesco, String estudiante_registro_civil) {
+    String sql = "INSERT INTO acudientes (cedula, nombre, apellidos, telefono, parentesco, estudiante_registro_civil) VALUES (?, ?, ?, ?, ?, ?)";
+    try (Connection conexion = conectar(); PreparedStatement ps = conexion.prepareStatement(sql)) {
+        ps.setString(1, cedula);
+        ps.setString(2, nombre);
+        ps.setString(3, apellidos);
+        ps.setString(4, telefono);
+        ps.setString(5, parentesco);
+        ps.setString(6, estudiante_registro_civil);
+        ps.executeUpdate();
+        System.out.println("✅ Acudiente insertado correctamente.");
+        return true;
+    } catch (SQLException e) {
+        System.err.println("❌ Error al insertar acudiente: " + e.getMessage());
+        return false;
+    }
+}
 }

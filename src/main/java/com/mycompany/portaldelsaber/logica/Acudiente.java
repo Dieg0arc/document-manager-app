@@ -1,88 +1,97 @@
 package com.mycompany.portaldelsaber.logica;
-
 import java.io.Serializable;
-import java.util.List;
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
 
 @Entity
+@Table(name = "acudientes")  // Especifica el nombre correcto de la tabla
 public class Acudiente implements Serializable {
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private int id_Acudiente;
     
-    private String cedula; // Cambiado a String para evitar problemas con ceros a la izquierda
-    private String nombre;
-    private String apellido;
-    private String telefono;
-
-    @OneToMany(mappedBy = "acudiente", cascade = CascadeType.ALL)
-    private List<Estudiante> estudiantes;
-
-    public Acudiente() {}
-
-    public Acudiente(int id_Acudiente, String cedula, String nombre, String apellido, String telefono, List<Estudiante> estudiantes) {
-        this.id_Acudiente = id_Acudiente;
-        setCedula(cedula);
-        this.nombre = nombre;
-        this.apellido = apellido;
-        setTelefono(telefono);
-        this.estudiantes = estudiantes;
+    @Id
+    private String cedulaAcuediente;
+    
+    private String nombreAcudiente;
+    private String apellidoAcudiente;
+    private String telefonoAcudiente;
+    private String parentesco;
+    
+    // Este es el campo que falta y causa que aparezca NULL
+    private String estudiante_registro_civil;
+    
+    // Relación bidireccional con Estudiante
+    @OneToOne(mappedBy = "acudiente")
+    private Estudiante estudiante;
+    
+    public Acudiente() {
     }
-
-    // Getters y Setters con validaciones
-    public int getId_Acudiente() {
-        return id_Acudiente;
+    
+    public Acudiente(String cedulaAcuediente, String nombreAcudiente, String apellidoAcudiente, 
+                     String telefonoAcudiente, String parentesco, String estudiante_registro_civil) {
+        this.cedulaAcuediente = cedulaAcuediente;
+        this.nombreAcudiente = nombreAcudiente;
+        this.apellidoAcudiente = apellidoAcudiente;
+        this.telefonoAcudiente = telefonoAcudiente;
+        this.parentesco = parentesco;
+        this.estudiante_registro_civil = estudiante_registro_civil;
     }
-
-    public void setId_Acudiente(int id_Acudiente) {
-        this.id_Acudiente = id_Acudiente;
+    
+    public String getCedulaAcuediente() {
+        return cedulaAcuediente;
     }
-
-    public String getCedula() {
-        return cedula;
+    
+    public void setCedulaAcuediente(String cedulaAcuediente) {
+        this.cedulaAcuediente = cedulaAcuediente;
     }
-
-    public void setCedula(String cedula) {
-        if (cedula.matches("\\d{8,10}")) {
-            this.cedula = cedula;
-        } else {
-            throw new IllegalArgumentException("La cédula debe contener máximo 10 dígitos numéricos.");
-        }
+    
+    public String getNombreAcudiente() {
+        return nombreAcudiente;
     }
-
-    public String getNombre() {
-        return nombre;
+    
+    public void setNombreAcudiente(String nombreAcudiente) {
+        this.nombreAcudiente = nombreAcudiente;
     }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
+    
+    public String getApellidoAcudiente() {
+        return apellidoAcudiente;
     }
-
-    public String getApellido() {
-        return apellido;
+    
+    public void setApellidoAcudiente(String apellidoAcudiente) {
+        this.apellidoAcudiente = apellidoAcudiente;
     }
-
-    public void setApellido(String apellido) {
-        this.apellido = apellido;
+    
+    public String getTelefonoAcudiente() {
+        return telefonoAcudiente;
     }
-
-    public String getTelefono() {
-        return telefono;
+    
+    public void setTelefonoAcudiente(String telefonoAcudiente) {
+        this.telefonoAcudiente = telefonoAcudiente;
     }
-
-    public void setTelefono(String telefono) {
-        if (telefono.matches("3\\d{9}")) {
-            this.telefono = telefono;
-        } else {
-            throw new IllegalArgumentException("El número de teléfono debe tener exactamente 10 dígitos y comenzar con 3.");
-        }
+    
+    public String getParentesco() {
+        return parentesco;
     }
-
-    public List<Estudiante> getEstudiantes() {
-        return estudiantes;
+    
+    public void setParentesco(String parentesco) {
+        this.parentesco = parentesco;
     }
-
-    public void setEstudiantes(List<Estudiante> estudiantes) {
-        this.estudiantes = estudiantes;
+    
+    // Getter y Setter para estudiante_registro_civil
+    public String getEstudiante_registro_civil() {
+        return estudiante_registro_civil;
+    }
+    
+    public void setEstudiante_registro_civil(String estudiante_registro_civil) {
+        this.estudiante_registro_civil = estudiante_registro_civil;
+    }
+    
+    // Getter y Setter para la relación con Estudiante
+    public Estudiante getEstudiante() {
+        return estudiante;
+    }
+    
+    public void setEstudiante(Estudiante estudiante) {
+        this.estudiante = estudiante;
     }
 }

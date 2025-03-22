@@ -1,7 +1,8 @@
 package com.mycompany.portaldelsaber.persistencia;
 
-import com.mycompany.portaldelsaber.logica.Estudiante;
+import com.mycompany.portaldelsaber.logica.Acudiente;
 import com.mycompany.portaldelsaber.persistencia.exceptions.NonexistentEntityException;
+import com.mycompany.portaldelsaber.persistencia.exceptions.PreexistingEntityException;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -12,29 +13,34 @@ import javax.persistence.Persistence;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
-public class EstudianteJpaController implements Serializable {
+public class AcudienteJpaController implements Serializable {
 
     private EntityManagerFactory emf = null;
 
-    public EstudianteJpaController(EntityManagerFactory emf) {
-        this.emf = emf;
-    }
-
-    public EstudianteJpaController() {
+    public AcudienteJpaController() {
        emf = Persistence.createEntityManagerFactory("PortalSaberPU");
+    }
+    
+    public AcudienteJpaController(EntityManagerFactory emf) {
+        this.emf = emf;
     }
         
     public EntityManager getEntityManager() {
         return emf.createEntityManager();
     }
 
-    public void create(Estudiante estudiante) {
+    public void create(Acudiente acudiente) throws PreexistingEntityException {
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            em.persist(estudiante);
+            em.persist(acudiente);
             em.getTransaction().commit();
+        } catch (Exception ex) {
+            if (findAcudiente(acudiente.getCedulaAcuediente()) != null) {
+                throw new PreexistingEntityException("Acudiente " + acudiente.getCedulaAcuediente() + " already exists.", ex);
+            }
+            throw ex;
         } finally {
             if (em != null) {
                 em.close();
@@ -42,19 +48,19 @@ public class EstudianteJpaController implements Serializable {
         }
     }
 
-    public void edit(Estudiante estudiante) throws NonexistentEntityException, Exception {
+    public void edit(Acudiente acudiente) throws NonexistentEntityException, Exception {
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            estudiante = em.merge(estudiante);
+            acudiente = em.merge(acudiente);
             em.getTransaction().commit();
         } catch (Exception ex) {
             String msg = ex.getLocalizedMessage();
             if (msg == null || msg.length() == 0) {
-                int id = estudiante.getId_Estudiante();
-                if (findEstudiante(id) == null) {
-                    throw new NonexistentEntityException("The estudiante with id " + id + " no longer exists.");
+                String id = acudiente.getCedulaAcuediente();
+                if (findAcudiente(id) == null) {
+                    throw new NonexistentEntityException("El acudiente con cédula " + id + " ya no existe.");
                 }
             }
             throw ex;
@@ -65,19 +71,19 @@ public class EstudianteJpaController implements Serializable {
         }
     }
 
-    public void destroy(int id) throws NonexistentEntityException {
+    public void destroy(String id) throws NonexistentEntityException {
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            Estudiante estudiante;
+            Acudiente acudiente;
             try {
-                estudiante = em.getReference(Estudiante.class, id);
-                estudiante.getId_Estudiante();
+                acudiente = em.getReference(Acudiente.class, id);
+                acudiente.getCedulaAcuediente();
             } catch (EntityNotFoundException enfe) {
-                throw new NonexistentEntityException("The estudiante with id " + id + " no longer exists.", enfe);
+                throw new NonexistentEntityException("El acudiente con cédula " + id + " ya no existe.", enfe);
             }
-            em.remove(estudiante);
+            em.remove(acudiente);
             em.getTransaction().commit();
         } finally {
             if (em != null) {
@@ -86,19 +92,19 @@ public class EstudianteJpaController implements Serializable {
         }
     }
 
-    public List<Estudiante> findEstudianteEntities() {
-        return findEstudianteEntities(true, -1, -1);
+    public List<Acudiente> findAcudienteEntities() {
+        return findAcudienteEntities(true, -1, -1);
     }
 
-    public List<Estudiante> findEstudianteEntities(int maxResults, int firstResult) {
-        return findEstudianteEntities(false, maxResults, firstResult);
+    public List<Acudiente> findAcudienteEntities(int maxResults, int firstResult) {
+        return findAcudienteEntities(false, maxResults, firstResult);
     }
 
-    private List<Estudiante> findEstudianteEntities(boolean all, int maxResults, int firstResult) {
+    private List<Acudiente> findAcudienteEntities(boolean all, int maxResults, int firstResult) {
         EntityManager em = getEntityManager();
         try {
             CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
-            cq.select(cq.from(Estudiante.class));
+            cq.select(cq.from(Acudiente.class));
             Query q = em.createQuery(cq);
             if (!all) {
                 q.setMaxResults(maxResults);
@@ -110,39 +116,23 @@ public class EstudianteJpaController implements Serializable {
         }
     }
 
-    public Estudiante findEstudiante(int id) {
+    public Acudiente findAcudiente(String id) {
         EntityManager em = getEntityManager();
         try {
-            return em.find(Estudiante.class, id);
+            return em.find(Acudiente.class, id);
         } finally {
             em.close();
         }
     }
 
-    public int getEstudianteCount() {
+    public int getAcudienteCount() {
         EntityManager em = getEntityManager();
         try {
             CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
-            Root<Estudiante> rt = cq.from(Estudiante.class);
+            Root<Acudiente> rt = cq.from(Acudiente.class);
             cq.select(em.getCriteriaBuilder().count(rt));
             Query q = em.createQuery(cq);
             return ((Long) q.getSingleResult()).intValue();
-        } finally {
-            em.close();
-        }
-    }
-    
-    public Estudiante findEstudianteByRegistroCivil(String registroCivil) {
-        EntityManager em = getEntityManager();
-        try {
-            Query query = em.createQuery("SELECT e FROM Estudiante e WHERE e.registro_civil = :registro");
-            query.setParameter("registro", registroCivil);
-            List<Estudiante> estudiantes = query.getResultList();
-            if (!estudiantes.isEmpty()) {
-                return estudiantes.get(0);
-            } else {
-                return null;
-            }
         } finally {
             em.close();
         }
