@@ -1,104 +1,145 @@
-
 package com.mycompany.portaldelsaber.igu;
 
-import com.mycompany.portaldelsaber.persistencia.ConexionBD;
-
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import javax.swing.JOptionPane;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-
-import javax.swing.JTextField;
-
+import com.mycompany.portaldelsaber.logica.Acudiente;
+import com.mycompany.portaldelsaber.logica.Controladora;
+import com.mycompany.portaldelsaber.persistencia.ConexionBD;
+import static java.awt.SystemColor.control;
 
 public class CargaDatosAcudiente extends javax.swing.JFrame {
 
+
+private Controladora control;
+private String registroCivilEstudiante;
+
 public CargaDatosAcudiente() {
+    this(null); // Constructor sin registro civil
+}
+
+    public CargaDatosAcudiente(String registroCivilEstudiante) {
     initComponents();
-
-    // Deshabilitar el botón "Siguiente" al inicio
-    btnSiguienteEstu.setEnabled(false);
-
-    // Deshabilitar el segundo acudiente al inicio
-    habilitarSegundoAcudiente(false);
-
-    // Validaciones de entrada
-    validarSoloNumeros(txtCCA1, 10);
-    validarSoloNumeros(txtPhoneAcu1, 11);
-    validarSoloNumeros(txtCCA2, 10);
-    validarSoloNumeros(txtPhoneAcu2, 11);
-    validarSoloLetras(txtNombreAcu1);
-    validarSoloLetras(txtApellidoAcu1);
-    validarSoloLetras(txtNombreAcu2);
-    validarSoloLetras(txtApellidosAcu2);
-
-    // Checkbox para habilitar el segundo acudiente
-    chkSegundoAcudiente.addActionListener(e -> habilitarSegundoAcudiente(chkSegundoAcudiente.isSelected()));
-
-    // Agregar validación al escribir en los campos del primer acudiente
-    agregarValidacionTiempoReal();
+    control = new Controladora();
+    
+    this.registroCivilEstudiante = registroCivilEstudiante;
+    
+    // Deshabilitar el botón Siguiente hasta que se guarde un acudiente
+    btnSiguienteA.setEnabled(false);
+    
+    // Aplicar restricciones a los campos
+    aplicarRestriccionesCampos();
 }
 
-// Método para validar y habilitar el botón "Siguiente"
-private void validarFormulario() {
-    boolean nombreOK = !txtNombreAcu1.getText().trim().isEmpty();
-    boolean apellidoOK = !txtApellidoAcu1.getText().trim().isEmpty();
-    boolean ccOK = txtCCA1.getText().trim().length() == 10;
-    boolean phoneOK = txtPhoneAcu1.getText().trim().length() == 11;
-
-    // Si todo está completo, habilitar el botón "Siguiente"
-    btnSiguienteEstu.setEnabled(nombreOK && apellidoOK && ccOK && phoneOK);
-}
-
-// Método para agregar validación en tiempo real a los campos del primer acudiente
-private void agregarValidacionTiempoReal() {
-    txtNombreAcu1.addKeyListener(new KeyAdapter() { public void keyReleased(KeyEvent e) { validarFormulario(); }});
-    txtApellidoAcu1.addKeyListener(new KeyAdapter() { public void keyReleased(KeyEvent e) { validarFormulario(); }});
-    txtCCA1.addKeyListener(new KeyAdapter() { public void keyReleased(KeyEvent e) { validarFormulario(); }});
-    txtPhoneAcu1.addKeyListener(new KeyAdapter() { public void keyReleased(KeyEvent e) { validarFormulario(); }});
-}
-
-// Método para validar solo números con un máximo de caracteres
-private void validarSoloNumeros(JTextField campo, int maxLength) {
-    campo.addKeyListener(new KeyAdapter() {
-        @Override
-        public void keyTyped(KeyEvent evt) {
+// Método para aplicar las restricciones a los campos
+    private void aplicarRestriccionesCampos() {
+    // Restricción para cédula (solo números)
+    txtCCAcu.addKeyListener(new java.awt.event.KeyAdapter() {
+        public void keyTyped(java.awt.event.KeyEvent evt) {
             char c = evt.getKeyChar();
-            if (!Character.isDigit(c) || campo.getText().length() >= maxLength) {
-                evt.consume();
+            if (!Character.isDigit(c)) {
+                evt.consume(); // Ignorar cualquier carácter que no sea un dígito
+            }
+            if (txtCCAcu.getText().length() >= 11) {
+                evt.consume(); // No permite más de 11 dígitos
             }
         }
     });
-}
-
-// Método para validar solo letras y espacios
-private void validarSoloLetras(JTextField campo) {
-    campo.addKeyListener(new KeyAdapter() {
-        @Override
-        public void keyTyped(KeyEvent evt) {
+    
+    // Restricción para teléfono (solo números)
+    txtPhoneAcu.addKeyListener(new java.awt.event.KeyAdapter() {
+        public void keyTyped(java.awt.event.KeyEvent evt) {
             char c = evt.getKeyChar();
-            if (!Character.isLetter(c) && c != ' ') { // Se permite el espacio
-                evt.consume();
+            if (!Character.isDigit(c)) {
+                evt.consume(); // Ignorar cualquier carácter que no sea un dígito
+            }
+            if (txtPhoneAcu.getText().length() >= 10) {
+                evt.consume(); 
             }
         }
     });
-}
-
-// Método para habilitar o deshabilitar el segundo acudiente
-private void habilitarSegundoAcudiente(boolean habilitado) {
-    txtNombreAcu2.setEnabled(habilitado);
-    txtApellidosAcu2.setEnabled(habilitado);
-    txtCCA2.setEnabled(habilitado);
-    txtPhoneAcu2.setEnabled(habilitado);
-
-    if (!habilitado) {
-        txtNombreAcu2.setText("");
-        txtApellidosAcu2.setText("");
-        txtCCA2.setText("");
-        txtPhoneAcu2.setText("");
+    txtPhoneAcu.addFocusListener(new java.awt.event.FocusAdapter() {
+    public void focusLost(java.awt.event.FocusEvent evt) {
+        String phone = txtPhoneAcu.getText().trim();
+        if (phone.length() > 0 && phone.length() < 10) {
+            JOptionPane.showMessageDialog(null, 
+                "El número de teléfono debe tener exactamente 10 dígitos.",
+                "Formato incorrecto", 
+                JOptionPane.WARNING_MESSAGE);
+            txtPhoneAcu.requestFocus();
+        }
     }
+});
+    
+    // Restricción para nombre (solo letras y convertir a mayúscula)
+    txtNombreAcu.addKeyListener(new java.awt.event.KeyAdapter() {
+        public void keyTyped(java.awt.event.KeyEvent evt) {
+            char c = evt.getKeyChar();
+            if (!(Character.isLetter(c) || c == ' ')) {
+                evt.consume(); // Ignorar cualquier carácter que no sea una letra o espacio
+            } else {
+                // Convertir a mayúscula
+                evt.setKeyChar(Character.toUpperCase(c));
+            }
+        }
+    });
+    
+    // Restricción para apellido (solo letras y convertir a mayúscula)
+    txtApellidoAcu.addKeyListener(new java.awt.event.KeyAdapter() {
+        public void keyTyped(java.awt.event.KeyEvent evt) {
+            char c = evt.getKeyChar();
+            if (!(Character.isLetter(c) || c == ' ')) {
+                evt.consume(); // Ignorar cualquier carácter que no sea una letra o espacio
+            } else {
+                // Convertir a mayúscula
+                evt.setKeyChar(Character.toUpperCase(c));
+            }
+        }
+    });
+    
+    // Restricción para parentesco (solo letras y convertir a mayúscula)
+    txtParentescoAcu.addKeyListener(new java.awt.event.KeyAdapter() {
+        public void keyTyped(java.awt.event.KeyEvent evt) {
+            char c = evt.getKeyChar();
+            if (!(Character.isLetter(c) || c == ' ')) {
+                evt.consume(); // Ignorar cualquier carácter que no sea una letra o espacio
+            } else {
+                // Convertir a mayúscula
+                evt.setKeyChar(Character.toUpperCase(c));
+            }
+        }
+    });
+    
+    // También podemos agregar un Document Listener para verificar si todos los campos están llenos
+    // y habilitar el botón Guardar solo cuando todos tengan contenido
+    
+    javax.swing.event.DocumentListener documentListener = new javax.swing.event.DocumentListener() {
+        public void changedUpdate(javax.swing.event.DocumentEvent e) {
+            verificarCamposCompletos();
+        }
+        public void removeUpdate(javax.swing.event.DocumentEvent e) {
+            verificarCamposCompletos();
+        }
+        public void insertUpdate(javax.swing.event.DocumentEvent e) {
+            verificarCamposCompletos();
+        }
+    };
+    
+    txtCCAcu.getDocument().addDocumentListener(documentListener);
+    txtNombreAcu.getDocument().addDocumentListener(documentListener);
+    txtApellidoAcu.getDocument().addDocumentListener(documentListener);
+    txtPhoneAcu.getDocument().addDocumentListener(documentListener);
+    txtNombreAcu.getDocument().addDocumentListener(documentListener);
+}
+
+// Método para verificar si todos los campos están completos
+    private void verificarCamposCompletos() {
+    boolean camposCompletos = !txtCCAcu.getText().trim().isEmpty() &&
+                             !txtNombreAcu.getText().trim().isEmpty() &&
+                             !txtApellidoAcu.getText().trim().isEmpty() &&
+                             !txtPhoneAcu.getText().trim().isEmpty() &&
+                             !txtNombreAcu.getText().trim().isEmpty();
+    
+    // Habilitar o deshabilitar el botón Guardar según si todos los campos están completos
+    btnGuardarEstudiante.setEnabled(camposCompletos);
 }
 
 
@@ -106,128 +147,40 @@ private void habilitarSegundoAcudiente(boolean habilitado) {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPanel1 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
-        jPanel2 = new javax.swing.JPanel();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
-        txtNombreAcu1 = new javax.swing.JTextField();
-        txtCCA1 = new javax.swing.JTextField();
-        txtApellidoAcu1 = new javax.swing.JTextField();
-        jLabel8 = new javax.swing.JLabel();
-        txtPhoneAcu1 = new javax.swing.JTextField();
-        btnGuardarAcudiente = new javax.swing.JButton();
-        btnLimpiarAcudiente = new javax.swing.JButton();
-        btnSiguienteEstu = new javax.swing.JButton();
-        jPanel3 = new javax.swing.JPanel();
-        jLabel5 = new javax.swing.JLabel();
-        jLabel6 = new javax.swing.JLabel();
-        jLabel7 = new javax.swing.JLabel();
+        jPanel5 = new javax.swing.JPanel();
+        jLabel11 = new javax.swing.JLabel();
+        jLabel12 = new javax.swing.JLabel();
+        jLabel13 = new javax.swing.JLabel();
         txtNombreAcu2 = new javax.swing.JTextField();
         txtCCA2 = new javax.swing.JTextField();
-        txtApellidosAcu2 = new javax.swing.JTextField();
-        jLabel9 = new javax.swing.JLabel();
+        txtApellidoAcu2 = new javax.swing.JTextField();
+        jLabel14 = new javax.swing.JLabel();
         txtPhoneAcu2 = new javax.swing.JTextField();
-        btnBackAcu1 = new javax.swing.JButton();
-        chkSegundoAcudiente = new javax.swing.JCheckBox();
+        jPanel1 = new javax.swing.JPanel();
+        jPanel2 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel6 = new javax.swing.JLabel();
+        btnGuardarEstudiante = new javax.swing.JButton();
+        btnLimpiarEstudiante = new javax.swing.JButton();
+        btnSiguienteA = new javax.swing.JButton();
+        btnBackA = new javax.swing.JButton();
+        jPanel6 = new javax.swing.JPanel();
+        jLabel2 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        jLabel15 = new javax.swing.JLabel();
+        txtNombreAcu = new javax.swing.JTextField();
+        txtCCAcu = new javax.swing.JTextField();
+        txtApellidoAcu = new javax.swing.JTextField();
+        jLabel8 = new javax.swing.JLabel();
+        txtPhoneAcu = new javax.swing.JTextField();
+        jLabel5 = new javax.swing.JLabel();
+        txtParentescoAcu = new javax.swing.JTextField();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        jLabel11.setText("Nombre");
 
-        jLabel1.setFont(new java.awt.Font("Dialog", 1, 48)); // NOI18N
-        jLabel1.setText("Datos acudiente");
+        jLabel12.setText("Cedula Acudiente");
 
-        jLabel2.setText("Nombre");
-
-        jLabel3.setText("Cedula Acudiente");
-
-        jLabel4.setText("Telefono");
-
-        txtNombreAcu1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtNombreAcu1ActionPerformed(evt);
-            }
-        });
-
-        txtCCA1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtCCA1ActionPerformed(evt);
-            }
-        });
-
-        jLabel8.setText("Apellidos");
-
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGap(51, 51, 51)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(txtPhoneAcu1)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(jLabel3)
-                                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(txtNombreAcu1, javax.swing.GroupLayout.DEFAULT_SIZE, 326, Short.MAX_VALUE)
-                                .addComponent(txtCCA1)
-                                .addComponent(txtApellidoAcu1))
-                            .addComponent(jLabel4))
-                        .addGap(0, 12, Short.MAX_VALUE)))
-                .addContainerGap())
-        );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jLabel3)
-                .addGap(18, 18, 18)
-                .addComponent(txtCCA1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(jLabel2)
-                .addGap(18, 18, 18)
-                .addComponent(txtNombreAcu1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(jLabel8)
-                .addGap(18, 18, 18)
-                .addComponent(txtApellidoAcu1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(jLabel4)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txtPhoneAcu1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(117, 117, 117))
-        );
-
-        btnGuardarAcudiente.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
-        btnGuardarAcudiente.setText("Guardar");
-        btnGuardarAcudiente.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnGuardarAcudienteActionPerformed(evt);
-            }
-        });
-
-        btnLimpiarAcudiente.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
-        btnLimpiarAcudiente.setText("Limpiar");
-        btnLimpiarAcudiente.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnLimpiarAcudienteActionPerformed(evt);
-            }
-        });
-
-        btnSiguienteEstu.setText("siguiente");
-        btnSiguienteEstu.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnSiguienteEstuActionPerformed(evt);
-            }
-        });
-
-        jLabel5.setText("Nombre");
-
-        jLabel6.setText("Cedula Acudiente2");
-
-        jLabel7.setText("Telefono");
+        jLabel13.setText("Telefono");
 
         txtNombreAcu2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -241,281 +194,418 @@ private void habilitarSegundoAcudiente(boolean habilitado) {
             }
         });
 
-        jLabel9.setText("Apellidos");
+        jLabel14.setText("Apellidos");
 
-        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
-        jPanel3.setLayout(jPanel3Layout);
-        jPanel3Layout.setHorizontalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
+        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
+        jPanel5.setLayout(jPanel5Layout);
+        jPanel5Layout.setHorizontalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
                 .addGap(51, 51, 51)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(txtPhoneAcu2)
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(jLabel6)
-                                .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addComponent(jLabel14, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jLabel12)
+                                .addComponent(jLabel11, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addComponent(txtNombreAcu2, javax.swing.GroupLayout.DEFAULT_SIZE, 326, Short.MAX_VALUE)
                                 .addComponent(txtCCA2)
-                                .addComponent(txtApellidosAcu2))
-                            .addComponent(jLabel7))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                                .addComponent(txtApellidoAcu2))
+                            .addComponent(jLabel13))
+                        .addGap(0, 12, Short.MAX_VALUE)))
                 .addContainerGap())
         );
-        jPanel3Layout.setVerticalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
+        jPanel5Layout.setVerticalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jLabel6)
+                .addComponent(jLabel12)
                 .addGap(18, 18, 18)
                 .addComponent(txtCCA2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(jLabel5)
+                .addComponent(jLabel11)
                 .addGap(18, 18, 18)
                 .addComponent(txtNombreAcu2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(jLabel9)
+                .addComponent(jLabel14)
                 .addGap(18, 18, 18)
-                .addComponent(txtApellidosAcu2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(txtApellidoAcu2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(jLabel7)
+                .addComponent(jLabel13)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtPhoneAcu2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(117, 117, 117))
         );
 
-        btnBackAcu1.setText("Volver");
-        btnBackAcu1.addActionListener(new java.awt.event.ActionListener() {
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setUndecorated(true);
+        setResizable(false);
+
+        jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jPanel2.setBackground(new java.awt.Color(51, 0, 102));
+        jPanel2.setMinimumSize(new java.awt.Dimension(1012, 578));
+        jPanel2.setPreferredSize(new java.awt.Dimension(1012, 578));
+        jPanel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jLabel1.setFont(new java.awt.Font("Dialog", 1, 48)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel1.setText("Datos Acudiente");
+        jPanel2.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(319, 6, 397, -1));
+
+        jLabel6.setIcon(new javax.swing.ImageIcon("C:\\Users\\Asus\\Desktop\\Mis codigos\\logot3.jpg")); // NOI18N
+        jPanel2.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(690, 140, -1, -1));
+
+        btnGuardarEstudiante.setBackground(new java.awt.Color(255, 255, 0));
+        btnGuardarEstudiante.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
+        btnGuardarEstudiante.setText("Guardar");
+        btnGuardarEstudiante.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        btnGuardarEstudiante.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        btnGuardarEstudiante.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnBackAcu1ActionPerformed(evt);
+                btnGuardarEstudianteActionPerformed(evt);
+            }
+        });
+        jPanel2.add(btnGuardarEstudiante, new org.netbeans.lib.awtextra.AbsoluteConstraints(604, 424, 180, 54));
+
+        btnLimpiarEstudiante.setBackground(new java.awt.Color(255, 255, 0));
+        btnLimpiarEstudiante.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
+        btnLimpiarEstudiante.setText("Limpiar");
+        btnLimpiarEstudiante.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLimpiarEstudianteActionPerformed(evt);
+            }
+        });
+        jPanel2.add(btnLimpiarEstudiante, new org.netbeans.lib.awtextra.AbsoluteConstraints(790, 424, 180, 54));
+
+        btnSiguienteA.setBackground(new java.awt.Color(255, 255, 0));
+        btnSiguienteA.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        btnSiguienteA.setForeground(new java.awt.Color(255, 255, 255));
+        btnSiguienteA.setText("Siguiente");
+        btnSiguienteA.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSiguienteAActionPerformed(evt);
+            }
+        });
+        jPanel2.add(btnSiguienteA, new org.netbeans.lib.awtextra.AbsoluteConstraints(790, 530, 100, 40));
+
+        btnBackA.setBackground(new java.awt.Color(255, 255, 0));
+        btnBackA.setText("Volver");
+        btnBackA.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBackAActionPerformed(evt);
+            }
+        });
+        jPanel2.add(btnBackA, new org.netbeans.lib.awtextra.AbsoluteConstraints(900, 530, 100, 40));
+
+        jPanel6.setBackground(new java.awt.Color(51, 0, 102));
+
+        jLabel2.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        jLabel2.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel2.setText("Nombre");
+
+        jLabel3.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        jLabel3.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel3.setText("Cedula Acudiente");
+
+        jLabel15.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        jLabel15.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel15.setText("Telefono");
+
+        txtNombreAcu.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtNombreAcuActionPerformed(evt);
             }
         });
 
-        chkSegundoAcudiente.setText("Segundo Acudiente");
+        txtCCAcu.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtCCAcuActionPerformed(evt);
+            }
+        });
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addGap(325, 325, 325)
-                .addComponent(btnGuardarAcudiente, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(btnLimpiarAcudiente, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(101, 101, 101)
-                .addComponent(btnSiguienteEstu, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnBackAcu1, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(8, 8, 8))
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(319, 319, 319)
-                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 397, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(63, 63, 63)
-                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(72, 72, 72)
-                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(chkSegundoAcudiente)
-                .addGap(306, 306, 306))
+        jLabel8.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        jLabel8.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel8.setText("Apellidos");
+
+        jLabel5.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        jLabel5.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel5.setText("Parentesco");
+
+        txtParentescoAcu.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtParentescoAcuActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
+        jPanel6.setLayout(jPanel6Layout);
+        jPanel6Layout.setHorizontalGroup(
+            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel6Layout.createSequentialGroup()
+                .addGap(52, 52, 52)
+                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(txtPhoneAcu)
+                    .addComponent(jLabel3)
+                    .addComponent(txtNombreAcu)
+                    .addComponent(txtCCAcu)
+                    .addComponent(txtApellidoAcu, javax.swing.GroupLayout.DEFAULT_SIZE, 326, Short.MAX_VALUE)
+                    .addComponent(jLabel15)
+                    .addComponent(txtParentescoAcu)
+                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel8)
+                    .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(62, Short.MAX_VALUE))
         );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jLabel1)
-                .addGap(45, 45, 45)
-                .addComponent(chkSegundoAcudiente)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 340, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 340, javax.swing.GroupLayout.PREFERRED_SIZE))
+        jPanel6Layout.setVerticalGroup(
+            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel6Layout.createSequentialGroup()
+                .addContainerGap(21, Short.MAX_VALUE)
+                .addComponent(jLabel5)
                 .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnGuardarAcudiente, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnLimpiarAcudiente, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnSiguienteEstu, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnBackAcu1, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(17, 17, 17))
+                .addComponent(txtParentescoAcu, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jLabel3)
+                .addGap(18, 18, 18)
+                .addComponent(txtCCAcu, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jLabel2)
+                .addGap(18, 18, 18)
+                .addComponent(txtNombreAcu, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jLabel8)
+                .addGap(18, 18, 18)
+                .addComponent(txtApellidoAcu, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jLabel15)
+                .addGap(18, 18, 18)
+                .addComponent(txtPhoneAcu, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(14, 14, 14))
         );
+
+        jPanel2.add(jPanel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 100, 440, -1));
+
+        jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void txtCCA1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtCCA1ActionPerformed
-        //boton cedula primer acudiente
-    }//GEN-LAST:event_txtCCA1ActionPerformed
-
-    private void btnGuardarAcudienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarAcudienteActionPerformed
-
-    String cedulaAcu1 = txtCCA1.getText().trim();
-    String nombreAcu1 = txtNombreAcu1.getText().trim();
-    String apellidosAcu1 = txtApellidoAcu1.getText().trim();
-    String telefonoAcu1 = txtPhoneAcu1.getText().trim();
-    
-    String cedulaAcu2 = txtCCA2.getText().trim();
-    String nombreAcu2 = txtNombreAcu2.getText().trim();
-    String apellidosAcu2 = txtApellidosAcu2.getText().trim();
-    String telefonoAcu2 = txtPhoneAcu2.getText().trim();
-    
-    if (cedulaAcu1.isEmpty() || nombreAcu1.isEmpty() || apellidosAcu1.isEmpty() || telefonoAcu1.isEmpty()) {
-        JOptionPane.showMessageDialog(this, "Por favor, complete todos los campos del primer acudiente.", "Error", JOptionPane.ERROR_MESSAGE);
-        return;
-    }
-    
-    if (!cedulaAcu1.matches("\\d{1,10}")) {
-        JOptionPane.showMessageDialog(this, "La cédula del primer acudiente debe contener hasta 10 dígitos numéricos.", "Error", JOptionPane.ERROR_MESSAGE);
-        return;
-    }
-    
-    if (!telefonoAcu1.matches("\\d{1,11}")) {
-        JOptionPane.showMessageDialog(this, "El teléfono del primer acudiente debe contener hasta 11 dígitos numéricos.", "Error", JOptionPane.ERROR_MESSAGE);
-        return;
-    }
-    
-    if (!cedulaAcu2.isEmpty() && (!cedulaAcu2.matches("\\d{1,10}") || !telefonoAcu2.matches("\\d{1,11}"))) {
-        JOptionPane.showMessageDialog(this, "Verifique que la cédula (hasta 10 dígitos) y el teléfono (hasta 11 dígitos) del segundo acudiente sean correctos.", "Error", JOptionPane.ERROR_MESSAGE);
-        return;
-    }
-    
-    try {
-        Connection conn = ConexionBD.conectar();
-        String sql = "INSERT INTO acudientes (cedula, nombre, apellidos, telefono) VALUES (?, ?, ?, ?);";
-        PreparedStatement pst = conn.prepareStatement(sql);
+    private void btnGuardarEstudianteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarEstudianteActionPerformed
+        try {
+        // Obtener datos del acudiente desde el formulario
+        String parentesco = txtParentescoAcu.getText().trim();
+        String cedulaAcu = txtCCAcu.getText().trim();
+        String nombreAcu = txtNombreAcu.getText().trim();
+        String apellidosAcu = txtApellidoAcu.getText().trim();
+        String telefonoAcu = txtPhoneAcu.getText().trim();
         
-        pst.setString(1, cedulaAcu1);
-        pst.setString(2, nombreAcu1);
-        pst.setString(3, apellidosAcu1);
-        pst.setString(4, telefonoAcu1);
-        pst.executeUpdate();
-        
-        if (!cedulaAcu2.isEmpty() && !nombreAcu2.isEmpty() && !apellidosAcu2.isEmpty() && !telefonoAcu2.isEmpty()) {
-            pst.setString(1, cedulaAcu2);
-            pst.setString(2, nombreAcu2);
-            pst.setString(3, apellidosAcu2);
-            pst.setString(4, telefonoAcu2);
-            pst.executeUpdate();
+        // Verificar campos
+        if (cedulaAcu.isEmpty() || nombreAcu.isEmpty() || apellidosAcu.isEmpty() || 
+            telefonoAcu.isEmpty() || parentesco.isEmpty()) {
+            JOptionPane.showMessageDialog(this, 
+                    "Por favor, complete todos los campos obligatorios.",
+                    "Datos incompletos", 
+                    JOptionPane.WARNING_MESSAGE);
+            return;
         }
         
-        JOptionPane.showMessageDialog(this, "Acudiente(s) guardado(s) correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+        // Verificar longitud del teléfono
+        if (telefonoAcu.length() != 10) {
+            JOptionPane.showMessageDialog(this, 
+                    "El número de teléfono debe tener exactamente 10 dígitos.",
+                    "Formato incorrecto", 
+                    JOptionPane.WARNING_MESSAGE);
+            txtPhoneAcu.requestFocus();
+            return;
+        }
         
-        txtCCA1.setText("");
-        txtNombreAcu1.setText("");
-        txtApellidoAcu1.setText("");
-        txtPhoneAcu1.setText("");
-        txtCCA2.setText("");
-        txtNombreAcu2.setText("");
-        txtApellidosAcu2.setText("");
-        txtPhoneAcu2.setText("");
+        // Usar el registro civil si está disponible, o null si no lo está
+        String registroCivil = (this.registroCivilEstudiante != null) ? this.registroCivilEstudiante : null;
         
-    } catch (SQLException e) {
-        JOptionPane.showMessageDialog(this, "Error al guardar en la base de datos: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        // Guardar el acudiente usando la conexión directa a la BD
+        boolean guardadoExitoso = ConexionBD.insertarAcudiente(cedulaAcu, nombreAcu, apellidosAcu, telefonoAcu, parentesco, registroCivil);
+        
+        if (guardadoExitoso) {
+            JOptionPane.showMessageDialog(this, 
+                    "Acudiente guardado exitosamente! Ahora puede continuar al siguiente paso.",
+                    "Información", 
+                    JOptionPane.INFORMATION_MESSAGE);
+            
+            // Habilitar el botón Siguiente después de guardar exitosamente
+            btnSiguienteA.setEnabled(true);
+            
+            // Opcionalmente, deshabilitar el botón Guardar para evitar duplicados
+            btnGuardarEstudiante.setEnabled(false);
+        } else {
+            JOptionPane.showMessageDialog(this, 
+                    "Error al guardar el acudiente. Intente nuevamente.",
+                    "Error", 
+                    JOptionPane.ERROR_MESSAGE);
+        }
+        
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(this, 
+                "Error al guardar el acudiente: " + e.getMessage(),
+                "Error", 
+                JOptionPane.ERROR_MESSAGE);
     }
+    }//GEN-LAST:event_btnGuardarEstudianteActionPerformed
 
-
-    }//GEN-LAST:event_btnGuardarAcudienteActionPerformed
-
-    private void btnLimpiarAcudienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimpiarAcudienteActionPerformed
-        txtNombreAcu1.setText("");
-        txtApellidoAcu1.setText("");
-        txtCCA1.setText("");
-        txtPhoneAcu1.setText("");
-        txtNombreAcu2.setText("");
-        txtApellidosAcu2.setText("");
-        txtCCA2.setText("");
-        txtPhoneAcu2.setText("");
-
-
-    }//GEN-LAST:event_btnLimpiarAcudienteActionPerformed
-
-    private void btnSiguienteEstuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSiguienteEstuActionPerformed
-                                    
-    CargaDatosEstudiantes estu = new CargaDatosEstudiantes();
-    estu.setVisible(true);
-    estu.setLocationRelativeTo(null);
-    this.dispose();  
-    }//GEN-LAST:event_btnSiguienteEstuActionPerformed
-
-    private void txtCCA2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtCCA2ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtCCA2ActionPerformed
-
-    private void txtNombreAcu1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNombreAcu1ActionPerformed
-    String text = txtNombreAcu1.getText();
-    if (!text.matches("[a-zA-Z ]+")) { 
-        JOptionPane.showMessageDialog(this, "Ingrese solo letras", "Error", JOptionPane.ERROR_MESSAGE);
-        txtNombreAcu1.setText("");
+    private void btnLimpiarEstudianteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimpiarEstudianteActionPerformed
+        limpiarCampos();
     }
-    }//GEN-LAST:event_txtNombreAcu1ActionPerformed
+       
+    private void limpiarCampos(){
+        txtNombreAcu.setText("");
+        txtApellidoAcu.setText("");
+        txtCCAcu.setText("");
+        txtPhoneAcu.setText("");
+        txtParentescoAcu.setText("");
+    }//GEN-LAST:event_btnLimpiarEstudianteActionPerformed
 
-    private void txtNombreAcu2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNombreAcu2ActionPerformed
-    String text = txtNombreAcu2.getText();
-    if (!text.matches("[a-zA-Z ]+")) { 
-        JOptionPane.showMessageDialog(this, "Ingrese solo letras", "Error", JOptionPane.ERROR_MESSAGE);
-        txtNombreAcu2.setText("");
-    }
-    }//GEN-LAST:event_txtNombreAcu2ActionPerformed
+    private void btnSiguienteAActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSiguienteAActionPerformed
+        // Obtener la cédula del acudiente
+String cedulaAcudiente = txtCCAcu.getText().trim();
+String Nombre = txtNombreAcu.getText().trim();
+String Apellido = txtApellidoAcu.getText().trim();
+String Phone = txtPhoneAcu.getText().trim(); // Corregido
+String Parentesco = txtParentescoAcu.getText().trim();
 
-    private void btnBackAcu1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackAcu1ActionPerformed
-        MenuEstudiante estu = new MenuEstudiante();
+// Validar que ningún campo esté vacío
+if (cedulaAcudiente.isEmpty() || Nombre.isEmpty() || Apellido.isEmpty() || 
+    Phone.isEmpty() || Parentesco.isEmpty()) {
+    JOptionPane.showMessageDialog(this, 
+            "Por favor, ingrese toda la información del acudiente antes de continuar.",
+            "Datos incompletos", 
+            JOptionPane.WARNING_MESSAGE);
+    return; // Importante: detener la ejecución si hay campos vacíos
+}
+        
+        // Crear una instancia de CargaDatosEstudiantes pasándole la cédula del acudiente
+        CargaDatosEstudiantes estu = new CargaDatosEstudiantes(); // Corregido el nombre de la variable
         estu.setVisible(true);
         estu.setLocationRelativeTo(null);
-        this.dispose();
-    }//GEN-LAST:event_btnBackAcu1ActionPerformed
+        this.dispose(); // Cierra la ventana actual
+    }//GEN-LAST:event_btnSiguienteAActionPerformed
 
-    public static void main(String args[]) {
+    private void btnBackAActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackAActionPerformed
+               // Volver a la pantalla anterior
+        MenuEstudiante menu = new MenuEstudiante(); 
+        menu.setVisible(true);
+        menu.setLocationRelativeTo(null);
+        this.dispose(); // Cierra la ventana actual
+    }//GEN-LAST:event_btnBackAActionPerformed
 
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new CargaDatosAcudiente().setVisible(true);
-            }
-        });
+    private void txtNombreAcu2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNombreAcu2ActionPerformed
+        String text = txtNombreAcu2.getText();
+        if (!text.matches("[a-zA-Z ]+")) {
+            JOptionPane.showMessageDialog(this, "Ingrese solo letras", "Error", JOptionPane.ERROR_MESSAGE);
+            txtNombreAcu2.setText("");
+        }
+    }//GEN-LAST:event_txtNombreAcu2ActionPerformed
+
+    private void txtCCA2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtCCA2ActionPerformed
+        //boton cedula primer acudiente
+    }//GEN-LAST:event_txtCCA2ActionPerformed
+
+    private void txtNombreAcuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNombreAcuActionPerformed
+        validarSoloLetras(txtNombreAcu);
+    }//GEN-LAST:event_txtNombreAcuActionPerformed
+
+    private void txtCCAcuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtCCAcuActionPerformed
+        //boton cedula primer acudiente
+    }//GEN-LAST:event_txtCCAcuActionPerformed
+
+    private void txtParentescoAcuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtParentescoAcuActionPerformed
+          validarSoloLetras(txtParentescoAcu);
+    }//GEN-LAST:event_txtParentescoAcuActionPerformed
+
+    private void validarSoloLetras(javax.swing.JTextField campo) {
+    String text = campo.getText();
+    if (!text.matches("[a-zA-Z ]+")) {
+        JOptionPane.showMessageDialog(this, "Ingrese solo letras", "Error", JOptionPane.ERROR_MESSAGE);
+        campo.setText("");
     }
+}
+        /**
+ * @param args the command line arguments
+ */
+    
+    public static void main(String args[]) {
+    /* Set the Nimbus look and feel */
+    //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+    /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+     * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+     */
+    try {
+        for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+            if ("Nimbus".equals(info.getName())) {
+                javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                break;
+            }
+        }
+    } catch (ClassNotFoundException ex) {
+        java.util.logging.Logger.getLogger(CargaDatosAcudiente.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+    } catch (InstantiationException ex) {
+        java.util.logging.Logger.getLogger(CargaDatosAcudiente.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+    } catch (IllegalAccessException ex) {
+        java.util.logging.Logger.getLogger(CargaDatosAcudiente.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+    } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+        java.util.logging.Logger.getLogger(CargaDatosAcudiente.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+    }
+    //</editor-fold>
+
+    /* Create and display the form */
+    java.awt.EventQueue.invokeLater(new Runnable() {
+        public void run() {
+            new CargaDatosAcudiente().setVisible(true);
+        }
+    });
+}
+
+        
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnBackAcu1;
-    private javax.swing.JButton btnGuardarAcudiente;
-    private javax.swing.JButton btnLimpiarAcudiente;
-    private javax.swing.JButton btnSiguienteEstu;
-    private javax.swing.JCheckBox chkSegundoAcudiente;
+    private javax.swing.JButton btnBackA;
+    private javax.swing.JButton btnGuardarEstudiante;
+    private javax.swing.JButton btnLimpiarEstudiante;
+    private javax.swing.JButton btnSiguienteA;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel11;
+    private javax.swing.JLabel jLabel12;
+    private javax.swing.JLabel jLabel13;
+    private javax.swing.JLabel jLabel14;
+    private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
-    private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
-    private javax.swing.JTextField txtApellidoAcu1;
-    private javax.swing.JTextField txtApellidosAcu2;
-    private javax.swing.JTextField txtCCA1;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
+    private javax.swing.JTextField txtApellidoAcu;
+    private javax.swing.JTextField txtApellidoAcu2;
     private javax.swing.JTextField txtCCA2;
-    private javax.swing.JTextField txtNombreAcu1;
+    private javax.swing.JTextField txtCCAcu;
+    private javax.swing.JTextField txtNombreAcu;
     private javax.swing.JTextField txtNombreAcu2;
-    private javax.swing.JTextField txtPhoneAcu1;
+    private javax.swing.JTextField txtParentescoAcu;
+    private javax.swing.JTextField txtPhoneAcu;
     private javax.swing.JTextField txtPhoneAcu2;
     // End of variables declaration//GEN-END:variables
 }

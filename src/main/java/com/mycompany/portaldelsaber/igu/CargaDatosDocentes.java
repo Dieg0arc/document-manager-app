@@ -11,7 +11,7 @@ import javax.swing.JOptionPane;
 public class CargaDatosDocentes extends javax.swing.JFrame {
 
     public CargaDatosDocentes() {
-initComponents();
+       initComponents();
     configurarValidaciones();
 }
 
@@ -23,7 +23,8 @@ private void configurarValidaciones() {
             if (!Character.isLetter(c) && !Character.isWhitespace(c)) {
                 evt.consume(); // No permite el carácter
             } else {
-                txtNombreDocente.setText(txtNombreDocente.getText().toUpperCase());
+                                // Convertir a mayúscula
+                evt.setKeyChar(Character.toUpperCase(c));
             }
         }
     });
@@ -35,7 +36,8 @@ private void configurarValidaciones() {
             if (!Character.isLetter(c) && !Character.isWhitespace(c)) {
                 evt.consume(); // No permite el carácter
             } else {
-                txtApellidoDocente.setText(txtApellidoDocente.getText().toUpperCase());
+                                // Convertir a mayúscula
+                evt.setKeyChar(Character.toUpperCase(c));
             }
         }
     });
@@ -52,6 +54,18 @@ private void configurarValidaciones() {
             }
         }
     });
+    //Validar que el año solo sean numeros, mínimo y máximo 4 digitos
+    txtAnio.addKeyListener(new java.awt.event.KeyAdapter() {
+        public void keyTyped(java.awt.event.KeyEvent evt) {
+            char c = evt.getKeyChar();
+            if (!Character.isDigit(c)) {
+                evt.consume(); // Solo permite números
+            }
+            if (txtAnio.getText().length() >= 4) {
+                evt.consume(); // No permite más de 11 dígitos
+            }
+        }
+    });
 }
 
  
@@ -61,7 +75,6 @@ private void configurarValidaciones() {
 
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
-        jLabel6 = new javax.swing.JLabel();
         btnGuardarDocente = new javax.swing.JButton();
         btnLimpiarDocente = new javax.swing.JButton();
         jPanel5 = new javax.swing.JPanel();
@@ -76,21 +89,22 @@ private void configurarValidaciones() {
         jLabel22 = new javax.swing.JLabel();
         txtAnio = new javax.swing.JTextField();
         jButton3 = new javax.swing.JButton();
+        jLabel6 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setUndecorated(true);
+        setPreferredSize(new java.awt.Dimension(1012, 578));
+        setResizable(false);
 
-        jPanel1.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel1.setBackground(new java.awt.Color(51, 0, 102));
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jLabel1.setFont(new java.awt.Font("Dialog", 1, 48)); // NOI18N
-        jLabel1.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
         jLabel1.setText("Datos docentes");
         jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(319, 6, 397, -1));
 
-        jLabel6.setIcon(new javax.swing.ImageIcon("C:\\Users\\Asus\\Desktop\\Preescolar\\Portal_Saber.jpg")); // NOI18N
-        jPanel1.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(669, 164, -1, -1));
-
-        btnGuardarDocente.setBackground(new java.awt.Color(204, 204, 0));
+        btnGuardarDocente.setBackground(new java.awt.Color(255, 255, 0));
         btnGuardarDocente.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
         btnGuardarDocente.setText("Guardar");
         btnGuardarDocente.addActionListener(new java.awt.event.ActionListener() {
@@ -98,9 +112,9 @@ private void configurarValidaciones() {
                 btnGuardarDocenteActionPerformed(evt);
             }
         });
-        jPanel1.add(btnGuardarDocente, new org.netbeans.lib.awtextra.AbsoluteConstraints(598, 422, 180, 54));
+        jPanel1.add(btnGuardarDocente, new org.netbeans.lib.awtextra.AbsoluteConstraints(610, 420, 180, 54));
 
-        btnLimpiarDocente.setBackground(new java.awt.Color(204, 204, 0));
+        btnLimpiarDocente.setBackground(new java.awt.Color(255, 255, 0));
         btnLimpiarDocente.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
         btnLimpiarDocente.setText("Limpiar");
         btnLimpiarDocente.addActionListener(new java.awt.event.ActionListener() {
@@ -108,16 +122,20 @@ private void configurarValidaciones() {
                 btnLimpiarDocenteActionPerformed(evt);
             }
         });
-        jPanel1.add(btnLimpiarDocente, new org.netbeans.lib.awtextra.AbsoluteConstraints(796, 422, 180, 54));
+        jPanel1.add(btnLimpiarDocente, new org.netbeans.lib.awtextra.AbsoluteConstraints(800, 420, 180, 54));
 
-        jPanel5.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel5.setBackground(new java.awt.Color(51, 0, 102));
 
+        jLabel18.setForeground(new java.awt.Color(255, 255, 255));
         jLabel18.setText("Nombre");
 
+        jLabel19.setForeground(new java.awt.Color(255, 255, 255));
         jLabel19.setText("Cedula de Ciudadania");
 
+        jLabel20.setForeground(new java.awt.Color(255, 255, 255));
         jLabel20.setText("Estado");
 
+        jLabel21.setForeground(new java.awt.Color(255, 255, 255));
         jLabel21.setText("Año");
 
         txtCC.addActionListener(new java.awt.event.ActionListener() {
@@ -133,6 +151,7 @@ private void configurarValidaciones() {
             }
         });
 
+        jLabel22.setForeground(new java.awt.Color(255, 255, 255));
         jLabel22.setText("Apellidos");
 
         txtAnio.addActionListener(new java.awt.event.ActionListener() {
@@ -189,14 +208,17 @@ private void configurarValidaciones() {
 
         jPanel1.add(jPanel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(64, 74, -1, -1));
 
-        jButton3.setBackground(new java.awt.Color(204, 204, 0));
+        jButton3.setBackground(new java.awt.Color(255, 255, 0));
         jButton3.setText("Volver");
         jButton3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton3ActionPerformed(evt);
             }
         });
-        jPanel1.add(jButton3, new org.netbeans.lib.awtextra.AbsoluteConstraints(890, 520, 100, 40));
+        jPanel1.add(jButton3, new org.netbeans.lib.awtextra.AbsoluteConstraints(900, 530, 100, 40));
+
+        jLabel6.setIcon(new javax.swing.ImageIcon("C:\\Users\\Asus\\Desktop\\Mis codigos\\logot3.jpg")); // NOI18N
+        jPanel1.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(690, 140, -1, -1));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -268,7 +290,7 @@ private void configurarValidaciones() {
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
 
-        MenuPrincipal form = new MenuPrincipal();
+        MenuDocente form = new MenuDocente();
         form.setVisible(true);
         form.setLocationRelativeTo(null);
         this.dispose(); // Cierra la ventana actual

@@ -13,10 +13,65 @@ public class ConsultaDocentes extends javax.swing.JFrame {
     
 public ConsultaDocentes() {
     initComponents();
+    configurarValidaciones();
     btnConsultarD.addActionListener(new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
             consultarDocente();
+        }
+    });
+}
+
+private void configurarValidaciones() {
+    // Validar que solo ingresen letras y espacios en Nombre
+    txtNombreC.addKeyListener(new java.awt.event.KeyAdapter() {
+        public void keyTyped(java.awt.event.KeyEvent evt) {
+            char c = evt.getKeyChar();
+            if (!Character.isLetter(c) && !Character.isWhitespace(c)) {
+                evt.consume(); // No permite el carácter
+            } else {
+                // Convertir a mayúscula
+                evt.setKeyChar(Character.toUpperCase(c));
+            }
+        }
+    });
+
+    // Validar que solo ingresen letras y espacios en Apellidos
+    txtApellidosC.addKeyListener(new java.awt.event.KeyAdapter() {
+        public void keyTyped(java.awt.event.KeyEvent evt) {
+            char c = evt.getKeyChar();
+            if (!Character.isLetter(c) && !Character.isWhitespace(c)) {
+                evt.consume(); // No permite el carácter
+            } else {
+                                // Convertir a mayúscula
+                evt.setKeyChar(Character.toUpperCase(c));
+            }
+        }
+    });
+
+    // Validar Registro Civil (solo números, mínimo 10 y máximo 11 dígitos)
+    txtCCD.addKeyListener(new java.awt.event.KeyAdapter() {
+        public void keyTyped(java.awt.event.KeyEvent evt) {
+            char c = evt.getKeyChar();
+            if (!Character.isDigit(c)) {
+                evt.consume(); // Solo permite números
+            }
+            if (txtCCD.getText().length() >= 11) {
+                evt.consume(); // No permite más de 11 dígitos
+            }
+        }
+    });
+    
+    //Validar que el año solo sean numeros, mínimo y máximo 4 digitos
+    txtAnioC.addKeyListener(new java.awt.event.KeyAdapter() {
+        public void keyTyped(java.awt.event.KeyEvent evt) {
+            char c = evt.getKeyChar();
+            if (!Character.isDigit(c)) {
+                evt.consume(); // Solo permite números
+            }
+            if (txtAnioC.getText().length() >= 4) {
+                evt.consume(); // No permite más de 11 dígitos
+            }
         }
     });
 }
@@ -315,6 +370,8 @@ private class MultipleURLClickListener extends java.awt.event.MouseAdapter {
         txtApellidosC = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setUndecorated(true);
+        setResizable(false);
 
         bgCE.setBackground(new java.awt.Color(51, 0, 102));
         bgCE.setMinimumSize(new java.awt.Dimension(1012, 578));
@@ -410,6 +467,7 @@ private class MultipleURLClickListener extends java.awt.event.MouseAdapter {
         bgCE.add(JLAnioC, new org.netbeans.lib.awtextra.AbsoluteConstraints(800, 100, -1, -1));
 
         btnLimpiarD.setBackground(new java.awt.Color(255, 255, 0));
+        btnLimpiarD.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
         btnLimpiarD.setForeground(new java.awt.Color(0, 0, 0));
         btnLimpiarD.setText("Limpiar");
         btnLimpiarD.addActionListener(new java.awt.event.ActionListener() {
@@ -417,17 +475,19 @@ private class MultipleURLClickListener extends java.awt.event.MouseAdapter {
                 btnLimpiarDActionPerformed(evt);
             }
         });
-        bgCE.add(btnLimpiarD, new org.netbeans.lib.awtextra.AbsoluteConstraints(520, 180, 100, 40));
+        bgCE.add(btnLimpiarD, new org.netbeans.lib.awtextra.AbsoluteConstraints(530, 180, 140, 40));
 
+        btnVolverCD.setBackground(new java.awt.Color(255, 255, 0));
         btnVolverCD.setText("Volver");
         btnVolverCD.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnVolverCDActionPerformed(evt);
             }
         });
-        bgCE.add(btnVolverCD, new org.netbeans.lib.awtextra.AbsoluteConstraints(900, 270, 90, 30));
+        bgCE.add(btnVolverCD, new org.netbeans.lib.awtextra.AbsoluteConstraints(890, 270, 100, 30));
 
         btnConsultarD.setBackground(new java.awt.Color(255, 255, 0));
+        btnConsultarD.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
         btnConsultarD.setForeground(new java.awt.Color(0, 0, 0));
         btnConsultarD.setText("Consultar");
         btnConsultarD.addActionListener(new java.awt.event.ActionListener() {
@@ -435,14 +495,15 @@ private class MultipleURLClickListener extends java.awt.event.MouseAdapter {
                 btnConsultarDActionPerformed(evt);
             }
         });
-        bgCE.add(btnConsultarD, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 180, 100, 40));
+        bgCE.add(btnConsultarD, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 180, 140, 40));
 
         txtRespuesta.setBackground(new java.awt.Color(204, 204, 204));
         txtRespuesta.setColumns(20);
         txtRespuesta.setFont(new java.awt.Font("Dialog", 1, 24)); // NOI18N
-        txtRespuesta.setForeground(new java.awt.Color(0, 0, 0));
+        txtRespuesta.setForeground(new java.awt.Color(153, 153, 153));
         txtRespuesta.setRows(5);
-        txtRespuesta.setText("acá se deberia mostrar la URL");
+        txtRespuesta.setText("                                                 Ingrese los datos para poder filtrar");
+        txtRespuesta.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jScrollPane1.setViewportView(txtRespuesta);
 
         bgCE.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 310, 990, 260));
@@ -467,11 +528,11 @@ private class MultipleURLClickListener extends java.awt.event.MouseAdapter {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(bgCE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(bgCE, javax.swing.GroupLayout.DEFAULT_SIZE, 1012, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(bgCE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(bgCE, javax.swing.GroupLayout.DEFAULT_SIZE, 578, Short.MAX_VALUE)
         );
 
         pack();
@@ -571,7 +632,7 @@ private class MultipleURLClickListener extends java.awt.event.MouseAdapter {
         txtApellidosC.setText("Ingrese los apellidos");
         txtApellidosC.setForeground(Color.gray);
         cmbEstadoCD.setSelectedIndex(0);
-        txtRespuesta.setText("agrega información en los campos para poder filtrar");
+        txtRespuesta.setText("                          agrega información en los campos para poder filtrar");
         txtRespuesta.setForeground(Color.gray);
     }//GEN-LAST:event_btnLimpiarDActionPerformed
 
