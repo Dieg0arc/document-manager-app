@@ -255,7 +255,7 @@ public CargaDatosAcudiente() {
         jLabel1.setText("Datos Acudiente");
         jPanel2.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(319, 6, 397, -1));
 
-        jLabel6.setIcon(new javax.swing.ImageIcon("C:\\Users\\Asus\\Desktop\\Mis codigos\\logot3.jpg")); // NOI18N
+        jLabel6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com.imagenes/logot3.jpg"))); // NOI18N
         jPanel2.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(690, 140, -1, -1));
 
         btnGuardarEstudiante.setBackground(new java.awt.Color(255, 255, 0));
@@ -292,6 +292,8 @@ public CargaDatosAcudiente() {
         jPanel2.add(btnSiguienteA, new org.netbeans.lib.awtextra.AbsoluteConstraints(790, 530, 100, 40));
 
         btnBackA.setBackground(new java.awt.Color(255, 255, 0));
+        btnBackA.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        btnBackA.setForeground(new java.awt.Color(255, 255, 255));
         btnBackA.setText("Volver");
         btnBackA.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {

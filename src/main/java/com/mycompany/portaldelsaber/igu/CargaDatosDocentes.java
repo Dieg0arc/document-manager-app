@@ -89,14 +89,14 @@ private void configurarValidaciones() {
         jLabel22 = new javax.swing.JLabel();
         txtAnio = new javax.swing.JTextField();
         jButton3 = new javax.swing.JButton();
-        jLabel6 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setUndecorated(true);
-        setPreferredSize(new java.awt.Dimension(1012, 578));
         setResizable(false);
 
         jPanel1.setBackground(new java.awt.Color(51, 0, 102));
+        jPanel1.setMinimumSize(new java.awt.Dimension(1012, 578));
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jLabel1.setFont(new java.awt.Font("Dialog", 1, 48)); // NOI18N
@@ -106,6 +106,7 @@ private void configurarValidaciones() {
 
         btnGuardarDocente.setBackground(new java.awt.Color(255, 255, 0));
         btnGuardarDocente.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
+        btnGuardarDocente.setForeground(new java.awt.Color(102, 0, 204));
         btnGuardarDocente.setText("Guardar");
         btnGuardarDocente.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -116,6 +117,7 @@ private void configurarValidaciones() {
 
         btnLimpiarDocente.setBackground(new java.awt.Color(255, 255, 0));
         btnLimpiarDocente.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
+        btnLimpiarDocente.setForeground(new java.awt.Color(102, 0, 204));
         btnLimpiarDocente.setText("Limpiar");
         btnLimpiarDocente.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -209,16 +211,17 @@ private void configurarValidaciones() {
         jPanel1.add(jPanel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(64, 74, -1, -1));
 
         jButton3.setBackground(new java.awt.Color(255, 255, 0));
+        jButton3.setForeground(new java.awt.Color(102, 0, 204));
         jButton3.setText("Volver");
         jButton3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton3ActionPerformed(evt);
             }
         });
-        jPanel1.add(jButton3, new org.netbeans.lib.awtextra.AbsoluteConstraints(900, 530, 100, 40));
+        jPanel1.add(jButton3, new org.netbeans.lib.awtextra.AbsoluteConstraints(890, 520, 100, 40));
 
-        jLabel6.setIcon(new javax.swing.ImageIcon("C:\\Users\\Asus\\Desktop\\Mis codigos\\logot3.jpg")); // NOI18N
-        jPanel1.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(690, 140, -1, -1));
+        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/logoPs3.jpg"))); // NOI18N
+        jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(690, 140, -1, -1));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -309,10 +312,10 @@ private void configurarValidaciones() {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel18;
     private javax.swing.JLabel jLabel19;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel20;
     private javax.swing.JLabel jLabel21;
     private javax.swing.JLabel jLabel22;
-    private javax.swing.JLabel jLabel6;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JTextField txtAnio;
