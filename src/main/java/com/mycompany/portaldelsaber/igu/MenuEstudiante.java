@@ -17,12 +17,12 @@ public class MenuEstudiante extends javax.swing.JFrame {
 
         jPanel2 = new javax.swing.JPanel();
         jButton3 = new javax.swing.JButton();
-        jLabel2 = new javax.swing.JLabel();
         jPanel4 = new javax.swing.JPanel();
         jButton2 = new javax.swing.JButton();
         jButton1 = new javax.swing.JButton();
         jLabel5 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
+        jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setUndecorated(true);
@@ -33,6 +33,7 @@ public class MenuEstudiante extends javax.swing.JFrame {
         jPanel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jButton3.setBackground(new java.awt.Color(255, 255, 0));
+        jButton3.setForeground(new java.awt.Color(102, 0, 204));
         jButton3.setText("Volver");
         jButton3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -40,9 +41,6 @@ public class MenuEstudiante extends javax.swing.JFrame {
             }
         });
         jPanel2.add(jButton3, new org.netbeans.lib.awtextra.AbsoluteConstraints(900, 530, 100, 40));
-
-        jLabel2.setIcon(new javax.swing.ImageIcon("C:\\Users\\Asus\\Desktop\\Mis codigos\\logot3.jpg")); // NOI18N
-        jPanel2.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(633, 192, -1, -1));
 
         jPanel4.setBackground(new java.awt.Color(51, 0, 102));
 
@@ -101,6 +99,9 @@ public class MenuEstudiante extends javax.swing.JFrame {
         jLabel4.setText("Preescolar");
         jPanel2.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 30, 260, -1));
 
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/logoPs2.jpg"))); // NOI18N
+        jPanel2.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(630, 170, -1, -1));
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -144,7 +145,7 @@ public class MenuEstudiante extends javax.swing.JFrame {
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
-    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel2;

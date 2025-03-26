@@ -49,13 +49,13 @@ private void configurarValidaciones() {
     });
 
     // Validar Registro Civil (solo números, mínimo 10 y máximo 11 dígitos)
-    txtRCC.addKeyListener(new java.awt.event.KeyAdapter() {
+    txtCCC.addKeyListener(new java.awt.event.KeyAdapter() {
         public void keyTyped(java.awt.event.KeyEvent evt) {
             char c = evt.getKeyChar();
             if (!Character.isDigit(c)) {
                 evt.consume(); // Solo permite números
             }
-            if (txtRCC.getText().length() >= 11) {
+            if (txtCCC.getText().length() >= 11) {
                 evt.consume(); // No permite más de 11 dígitos
             }
         }
@@ -81,13 +81,15 @@ private void consultarEstudiante() {
     String apellidos = txtApellidosC.getText().trim();
     String grado = cmbGradoC.getSelectedItem().toString();
     String anio = txtAnioC.getText().trim();
+    String cedula = txtCCC.getText().trim();
     
     // Verificar si hay al menos un criterio de búsqueda válido
     if ((registroCivil.isEmpty() || registroCivil.equals("Ingrese el registro civil")) &&
         (nombre.isEmpty() || nombre.equals("Ingrese el nombre")) &&
         (apellidos.isEmpty() || apellidos.equals("Ingrese los apellidos")) &&
         (grado.equals("-") || grado.equals(" ")) &&
-        (anio.isEmpty() || anio.equals("Ingrese el año"))) {
+        (anio.isEmpty() || anio.equals("Ingrese el año")) &&
+        (cedula.isEmpty() || anio.equals( "Ingrese la cedula del acudiente"))) {
         JOptionPane.showMessageDialog(this, "Ingrese al menos un criterio de búsqueda.", "Error", JOptionPane.ERROR_MESSAGE);
         return;
     }
@@ -113,6 +115,10 @@ private void consultarEstudiante() {
         if (!apellidos.isEmpty() && !apellidos.equals("Ingrese los apellidos")) {
             sqlBuilder.append(" AND apellidos LIKE ?");
             params.add("%" + apellidos + "%");
+        }
+        if (!cedula.isEmpty() && !cedula.equals("Ingrese la cedula del acudiente")){
+           sqlBuilder.append(" AND cedula_acudiente = ?");
+           params.add ( cedula );
         }
         
         if (!grado.equals("-") && !grado.equals(" ")) {
@@ -160,6 +166,7 @@ private void consultarEstudiante() {
                 String foundAnio = rs.getString("anio");
                 String foundNombre = rs.getString("nombre");
                 String foundApellidos = rs.getString("apellidos");
+                String foundCedula = rs.getString("cedula_acudiente");
                 
                 // Actualizar los campos del formulario
                 txtRCC.setText(rc);
@@ -196,7 +203,7 @@ private void consultarEstudiante() {
         } else {
             // MÚLTIPLES RESULTADOS: mostrar tabla para todos los casos
             Object[][] data = new Object[resultCount][5];
-            String[] columnNames = {"Registro Civil", "Nombre", "Apellidos", "Grado", "Año"};
+            String[] columnNames = {"Registro Civil", "Nombre", "Apellidos", "Grado", "Año", "Cedula Acudiente"};
             
             int index = 0;
             while (rs.next()) {
@@ -205,6 +212,7 @@ private void consultarEstudiante() {
                 data[index][2] = rs.getString("apellidos");
                 data[index][3] = rs.getString("grado");
                 data[index][4] = rs.getString("anio");
+                data[index][5] = rs.getString("cedula_acudiente");
                 index++;
             }
             
@@ -241,9 +249,10 @@ private void consultarEstudiante() {
                 txtRCC.setText((String) data[selectedRow][0]);
                 txtNombreC.setText((String) data[selectedRow][1]);
                 txtApellidosC.setText((String) data[selectedRow][2]);
+                txtCCC.setText ((String) data[selectedRow][3]);
                 
                 // Establecer el grado en el combo box
-                String selectedGrado = (String) data[selectedRow][3];
+                String selectedGrado = (String) data[selectedRow][4];
                 for (int i = 0; i < cmbGradoC.getItemCount(); i++) {
                     if (cmbGradoC.getItemAt(i).equals(selectedGrado)) {
                         cmbGradoC.setSelectedIndex(i);
@@ -256,7 +265,7 @@ private void consultarEstudiante() {
                 // Generar y mostrar la ruta del archivo
                 String rc = (String) data[selectedRow][0];
                 String rutaArchivo = "C:\\Users\\Asus\\Desktop\\PruebasPS\\" + data[selectedRow][4] + 
-                                     "\\estudiante\\" + data[selectedRow][3] + "\\" + rc + ".pdf";
+                                     "\\estudiante\\" + data[selectedRow][4] + "\\" + rc + ".pdf";
                 txtRespuesta.setText(rutaArchivo);
                 
                 // Hacer que el área de texto se vea como un URL cliqueable
@@ -303,7 +312,7 @@ private class MultipleURLClickListener extends java.awt.event.MouseAdapter {
                 String text = txtRespuesta.getText();
                 
                 // Encontramos la línea donde se hizo clic
-                int caretPosition = txtRespuesta.viewToModel2D(evt.getPoint());
+                int caretPosition = txtRespuesta.viewToModel(evt.getPoint());
                 int lineStart = 0;
                 int lineEnd = text.length();
                 
@@ -349,7 +358,7 @@ private class MultipleURLClickListener extends java.awt.event.MouseAdapter {
         bgCE = new javax.swing.JPanel();
         tituloConsultae = new javax.swing.JLabel();
         JLRC = new javax.swing.JLabel();
-        txtRCC = new javax.swing.JTextField();
+        txtCCC = new javax.swing.JTextField();
         txtNombreC = new javax.swing.JTextField();
         JLNombreC = new javax.swing.JLabel();
         txtAnioC = new javax.swing.JTextField();
@@ -363,6 +372,8 @@ private class MultipleURLClickListener extends java.awt.event.MouseAdapter {
         jScrollPane1 = new javax.swing.JScrollPane();
         txtRespuesta = new javax.swing.JTextArea();
         txtApellidosC = new javax.swing.JTextField();
+        txtRCC = new javax.swing.JTextField();
+        jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setLocationByPlatform(true);
@@ -377,30 +388,30 @@ private class MultipleURLClickListener extends java.awt.event.MouseAdapter {
         tituloConsultae.setFont(new java.awt.Font("Dialog", 1, 48)); // NOI18N
         tituloConsultae.setForeground(new java.awt.Color(255, 255, 255));
         tituloConsultae.setText("Consulta Estudiante");
-        bgCE.add(tituloConsultae, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 10, -1, -1));
+        bgCE.add(tituloConsultae, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 10, -1, -1));
 
         JLRC.setBackground(new java.awt.Color(255, 255, 255));
         JLRC.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
         JLRC.setForeground(new java.awt.Color(255, 255, 255));
         JLRC.setText("Resgitro civil");
-        bgCE.add(JLRC, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 100, 130, -1));
+        bgCE.add(JLRC, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 100, 130, -1));
 
-        txtRCC.setBackground(new java.awt.Color(255, 255, 255));
-        txtRCC.setForeground(new java.awt.Color(204, 204, 204));
-        txtRCC.setText("Ingrese el registro civil");
-        txtRCC.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
-        txtRCC.setCaretColor(new java.awt.Color(204, 204, 204));
-        txtRCC.addMouseListener(new java.awt.event.MouseAdapter() {
+        txtCCC.setBackground(new java.awt.Color(255, 255, 255));
+        txtCCC.setForeground(new java.awt.Color(204, 204, 204));
+        txtCCC.setText("Ingrese la cedula del acudiente");
+        txtCCC.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        txtCCC.setCaretColor(new java.awt.Color(204, 204, 204));
+        txtCCC.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mousePressed(java.awt.event.MouseEvent evt) {
-                txtRCCMousePressed(evt);
+                txtCCCMousePressed(evt);
             }
         });
-        txtRCC.addActionListener(new java.awt.event.ActionListener() {
+        txtCCC.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtRCCActionPerformed(evt);
+                txtCCCActionPerformed(evt);
             }
         });
-        bgCE.add(txtRCC, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 130, 190, -1));
+        bgCE.add(txtCCC, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 210, 190, -1));
 
         txtNombreC.setBackground(new java.awt.Color(255, 255, 255));
         txtNombreC.setForeground(new java.awt.Color(204, 204, 204));
@@ -416,13 +427,13 @@ private class MultipleURLClickListener extends java.awt.event.MouseAdapter {
                 txtNombreCActionPerformed(evt);
             }
         });
-        bgCE.add(txtNombreC, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 130, 190, -1));
+        bgCE.add(txtNombreC, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 130, 190, -1));
 
         JLNombreC.setBackground(new java.awt.Color(255, 255, 255));
         JLNombreC.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
         JLNombreC.setForeground(new java.awt.Color(255, 255, 255));
         JLNombreC.setText("Nombre");
-        bgCE.add(JLNombreC, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 100, -1, -1));
+        bgCE.add(JLNombreC, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 100, -1, -1));
 
         txtAnioC.setBackground(new java.awt.Color(255, 255, 255));
         txtAnioC.setForeground(new java.awt.Color(204, 204, 204));
@@ -438,25 +449,25 @@ private class MultipleURLClickListener extends java.awt.event.MouseAdapter {
                 txtAnioCActionPerformed(evt);
             }
         });
-        bgCE.add(txtAnioC, new org.netbeans.lib.awtextra.AbsoluteConstraints(800, 130, 130, -1));
+        bgCE.add(txtAnioC, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 210, 130, -1));
 
         JLApellidosC.setBackground(new java.awt.Color(255, 255, 255));
         JLApellidosC.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
         JLApellidosC.setForeground(new java.awt.Color(255, 255, 255));
         JLApellidosC.setText("Apellidos");
-        bgCE.add(JLApellidosC, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 100, -1, -1));
+        bgCE.add(JLApellidosC, new org.netbeans.lib.awtextra.AbsoluteConstraints(650, 100, -1, -1));
 
         JLGradoC.setBackground(new java.awt.Color(255, 255, 255));
         JLGradoC.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
         JLGradoC.setForeground(new java.awt.Color(255, 255, 255));
         JLGradoC.setText("Grado");
-        bgCE.add(JLGradoC, new org.netbeans.lib.awtextra.AbsoluteConstraints(690, 100, -1, -1));
+        bgCE.add(JLGradoC, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 180, -1, -1));
 
         JLAnioC.setBackground(new java.awt.Color(255, 255, 255));
         JLAnioC.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
         JLAnioC.setForeground(new java.awt.Color(255, 255, 255));
         JLAnioC.setText("Año");
-        bgCE.add(JLAnioC, new org.netbeans.lib.awtextra.AbsoluteConstraints(800, 100, -1, -1));
+        bgCE.add(JLAnioC, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 180, -1, -1));
 
         cmbGradoC.setForeground(new java.awt.Color(0, 0, 0));
         cmbGradoC.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "-", "Parvulos", "Pre-jardin", "Jardin", "Transicion" }));
@@ -465,20 +476,21 @@ private class MultipleURLClickListener extends java.awt.event.MouseAdapter {
                 cmbGradoCMousePressed(evt);
             }
         });
-        bgCE.add(cmbGradoC, new org.netbeans.lib.awtextra.AbsoluteConstraints(690, 130, -1, -1));
+        bgCE.add(cmbGradoC, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 210, -1, -1));
 
         btnLimpiarE.setBackground(new java.awt.Color(255, 255, 0));
         btnLimpiarE.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
-        btnLimpiarE.setForeground(new java.awt.Color(0, 0, 0));
+        btnLimpiarE.setForeground(new java.awt.Color(102, 0, 204));
         btnLimpiarE.setText("Limpiar");
         btnLimpiarE.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnLimpiarEActionPerformed(evt);
             }
         });
-        bgCE.add(btnLimpiarE, new org.netbeans.lib.awtextra.AbsoluteConstraints(530, 180, 140, 40));
+        bgCE.add(btnLimpiarE, new org.netbeans.lib.awtextra.AbsoluteConstraints(530, 260, 140, 40));
 
         btnVolverCE.setBackground(new java.awt.Color(255, 255, 0));
+        btnVolverCE.setForeground(new java.awt.Color(102, 0, 204));
         btnVolverCE.setText("Volver");
         btnVolverCE.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -489,14 +501,14 @@ private class MultipleURLClickListener extends java.awt.event.MouseAdapter {
 
         btnConsultarE.setBackground(new java.awt.Color(255, 255, 0));
         btnConsultarE.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
-        btnConsultarE.setForeground(new java.awt.Color(0, 0, 0));
+        btnConsultarE.setForeground(new java.awt.Color(102, 0, 204));
         btnConsultarE.setText("Consultar");
         btnConsultarE.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnConsultarEActionPerformed(evt);
             }
         });
-        bgCE.add(btnConsultarE, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 180, 140, 40));
+        bgCE.add(btnConsultarE, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 260, 140, 40));
 
         txtRespuesta.setBackground(new java.awt.Color(204, 204, 204));
         txtRespuesta.setColumns(20);
@@ -522,7 +534,29 @@ private class MultipleURLClickListener extends java.awt.event.MouseAdapter {
                 txtApellidosCActionPerformed(evt);
             }
         });
-        bgCE.add(txtApellidosC, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 130, 190, -1));
+        bgCE.add(txtApellidosC, new org.netbeans.lib.awtextra.AbsoluteConstraints(650, 130, 190, -1));
+
+        txtRCC.setBackground(new java.awt.Color(255, 255, 255));
+        txtRCC.setForeground(new java.awt.Color(204, 204, 204));
+        txtRCC.setText("Ingrese el registro civil");
+        txtRCC.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        txtRCC.setCaretColor(new java.awt.Color(204, 204, 204));
+        txtRCC.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                txtRCCMousePressed(evt);
+            }
+        });
+        txtRCC.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtRCCActionPerformed(evt);
+            }
+        });
+        bgCE.add(txtRCC, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 130, 190, -1));
+
+        jLabel1.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel1.setText("Cedula Acudiente");
+        bgCE.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 180, -1, -1));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -547,7 +581,9 @@ private class MultipleURLClickListener extends java.awt.event.MouseAdapter {
 
     private void btnLimpiarEActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimpiarEActionPerformed
     txtRCC.setText("Ingrese el registro civil");
-    txtRCC.setForeground(Color.gray);
+    txtRCC.setForeground(Color.gray);    
+    txtCCC.setText("Ingrese la cedula del acudiente");
+    txtCCC.setForeground(Color.gray);
     txtNombreC.setText("Ingrese el nombre");
     txtNombreC.setForeground(Color.gray);
     txtAnioC.setText("Ingrese el año");
@@ -555,7 +591,7 @@ private class MultipleURLClickListener extends java.awt.event.MouseAdapter {
     txtApellidosC.setText("Ingrese los apellidos");
     txtApellidosC.setForeground(Color.gray);
     cmbGradoC.setSelectedIndex(0);
-    txtRespuesta.setText("                          agrega información en los campos para poder filtrar");
+    txtRespuesta.setText("                                     agrega información en los campos para poder filtrar");
     txtRespuesta.setForeground(Color.gray);
 
     }//GEN-LAST:event_btnLimpiarEActionPerformed
@@ -564,6 +600,10 @@ private class MultipleURLClickListener extends java.awt.event.MouseAdapter {
         if (txtRCC.getText().isEmpty()) {
             txtRCC.setText("Ingrese el registro civil");
             txtRCC.setForeground(Color.gray);
+        }
+        if (txtCCC.getText().isEmpty()) {
+            txtCCC.setText("Ingrese la cedula del acudiente");
+            txtCCC.setForeground(Color.gray);
         }
         if (txtNombreC.getText().isEmpty()) {
             txtNombreC.setText("Ingrese el nombre");
@@ -583,6 +623,10 @@ private class MultipleURLClickListener extends java.awt.event.MouseAdapter {
         if (txtRCC.getText().isEmpty()) {
             txtRCC.setText("Ingrese el registro civil");
             txtRCC.setForeground(Color.gray);
+        }
+        if (txtCCC.getText().isEmpty()) {
+            txtCCC.setText("Ingrese la cedula del acudiente");
+            txtCCC.setForeground(Color.gray);
         }
         if (txtNombreC.getText().isEmpty()) {
             txtNombreC.setText("Ingrese el nombre");
@@ -606,6 +650,10 @@ private class MultipleURLClickListener extends java.awt.event.MouseAdapter {
         if (txtRCC.getText().isEmpty()) {
             txtRCC.setText("Ingrese el registro civil");
             txtRCC.setForeground(Color.gray);
+        }        
+        if (txtCCC.getText().isEmpty()) {
+            txtCCC.setText("Ingrese la cedula del acudiente");
+            txtCCC.setForeground(Color.gray);
         }
         if (txtNombreC.getText().equals("Ingrese el nombre")) {
             txtNombreC.setText("");
@@ -621,14 +669,18 @@ private class MultipleURLClickListener extends java.awt.event.MouseAdapter {
         }
     }//GEN-LAST:event_txtNombreCMousePressed
 
-    private void txtRCCActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtRCCActionPerformed
+    private void txtCCCActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtCCCActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_txtRCCActionPerformed
+    }//GEN-LAST:event_txtCCCActionPerformed
 
-    private void txtRCCMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtRCCMousePressed
-    if (txtRCC.getText().equals("Ingrese el registro civil")) {
-        txtRCC.setText("");
-        txtRCC.setForeground(Color.black);
+    private void txtCCCMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtCCCMousePressed
+    if (txtRCC.getText().isEmpty()) {
+        txtRCC.setText("Ingrese el registro civil");
+        txtRCC.setForeground(Color.gray);
+        }   
+    if (txtCCC.getText().equals("Ingrese la cedula del acudiente")) {
+        txtCCC.setText("");
+        txtCCC.setForeground(Color.black);
     }
     if (txtNombreC.getText().isEmpty()) {
         txtNombreC.setText("Ingrese el nombre");
@@ -642,20 +694,24 @@ private class MultipleURLClickListener extends java.awt.event.MouseAdapter {
         txtApellidosC.setText("Ingrese los apellidos");
         txtApellidosC.setForeground(Color.gray);
     }
-    }//GEN-LAST:event_txtRCCMousePressed
+    }//GEN-LAST:event_txtCCCMousePressed
 
     private void btnConsultarEActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConsultarEActionPerformed
         consultarEstudiante();
     }//GEN-LAST:event_btnConsultarEActionPerformed
 
     private void txtApellidosCMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtApellidosCMousePressed
-            if (txtApellidosC.getText().equals("Ingrese los apellidos")) {
-        txtApellidosC.setText("");
-        txtApellidosC.setForeground(Color.black);
-    }
     if (txtRCC.getText().isEmpty()) {
         txtRCC.setText("Ingrese el registro civil");
         txtRCC.setForeground(Color.gray);
+        }   
+    if (txtApellidosC.getText().equals("Ingrese los apellidos")) {
+        txtApellidosC.setText("");
+        txtApellidosC.setForeground(Color.black);
+    }
+    if (txtCCC.getText().isEmpty()) {
+        txtCCC.setText("Ingrese la cedula del acudiente");
+        txtCCC.setForeground(Color.gray);
     }
     if (txtNombreC.getText().isEmpty()) {
         txtNombreC.setText("Ingrese el nombre");
@@ -668,13 +724,17 @@ private class MultipleURLClickListener extends java.awt.event.MouseAdapter {
     }//GEN-LAST:event_txtApellidosCMousePressed
 
     private void txtAnioCActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtAnioCActionPerformed
+    if (txtRCC.getText().isEmpty()) {
+        txtRCC.setText("Ingrese el registro civil");
+        txtRCC.setForeground(Color.gray);
+        } 
     if (txtAnioC.getText().equals("Ingrese el año")) {
         txtAnioC.setText("");
         txtAnioC.setForeground(Color.black);
     }
-    if (txtRCC.getText().isEmpty()) {
-        txtRCC.setText("Ingrese el registro civil");
-        txtRCC.setForeground(Color.gray);
+    if (txtCCC.getText().isEmpty()) {
+        txtCCC.setText("Ingrese la cedula del acudiente");
+        txtCCC.setForeground(Color.gray);
     }
     if (txtNombreC.getText().isEmpty()) {
         txtNombreC.setText("Ingrese el nombre");
@@ -691,9 +751,9 @@ private class MultipleURLClickListener extends java.awt.event.MouseAdapter {
         txtApellidosC.setText("");
         txtApellidosC.setForeground(Color.black);
     }
-    if (txtRCC.getText().isEmpty()) {
-        txtRCC.setText("Ingrese el registro civil");
-        txtRCC.setForeground(Color.gray);
+    if (txtCCC.getText().isEmpty()) {
+        txtCCC.setText("Ingrese el registro civil");
+        txtCCC.setForeground(Color.gray);
     }
     if (txtNombreC.getText().isEmpty()) {
         txtNombreC.setText("Ingrese el nombre");
@@ -704,6 +764,33 @@ private class MultipleURLClickListener extends java.awt.event.MouseAdapter {
         txtAnioC.setForeground(Color.gray);
     }
     }//GEN-LAST:event_txtApellidosCActionPerformed
+
+    private void txtRCCMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtRCCMousePressed
+    if (txtRCC.getText().equals("Ingrese el registro civil")) {
+        txtRCC.setText("");
+        txtRCC.setForeground(Color.black);
+    }
+        if (txtCCC.getText().isEmpty()) {
+            txtCCC.setText("Ingrese la cedula del acudiente");
+            txtCCC.setForeground(Color.gray);
+        }
+        if (txtNombreC.getText().isEmpty()) {
+            txtNombreC.setText("Ingrese el nombre");
+            txtNombreC.setForeground(Color.gray);
+        }
+        if (txtAnioC.getText().isEmpty()) {
+            txtAnioC.setText("Ingrese los apellidos");
+            txtAnioC.setForeground(Color.gray);
+        }
+        if (txtApellidosC.getText().isEmpty()) {
+            txtApellidosC.setText("Ingrese los apellidos");
+            txtApellidosC.setForeground(Color.gray);
+        }
+    }//GEN-LAST:event_txtRCCMousePressed
+
+    private void txtRCCActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtRCCActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtRCCActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -717,10 +804,12 @@ private class MultipleURLClickListener extends java.awt.event.MouseAdapter {
     private javax.swing.JButton btnLimpiarE;
     private javax.swing.JButton btnVolverCE;
     private javax.swing.JComboBox<String> cmbGradoC;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel tituloConsultae;
     private javax.swing.JTextField txtAnioC;
     private javax.swing.JTextField txtApellidosC;
+    private javax.swing.JTextField txtCCC;
     private javax.swing.JTextField txtNombreC;
     private javax.swing.JTextField txtRCC;
     private javax.swing.JTextArea txtRespuesta;

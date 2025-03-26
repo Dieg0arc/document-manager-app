@@ -295,13 +295,14 @@ public CargaDatosEstudiantes() {
                 .addComponent(jLabel4)
                 .addGap(18, 18, 18)
                 .addComponent(cmbGrado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(73, 73, 73))
+                .addGap(64, 64, 64))
         );
 
         jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 150, 380, 400));
 
         btnGuardarEstudiante.setBackground(new java.awt.Color(255, 255, 0));
         btnGuardarEstudiante.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
+        btnGuardarEstudiante.setForeground(new java.awt.Color(102, 0, 204));
         btnGuardarEstudiante.setText("Guardar");
         btnGuardarEstudiante.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
         btnGuardarEstudiante.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
@@ -314,6 +315,7 @@ public CargaDatosEstudiantes() {
 
         btnLimpiarEstudiante.setBackground(new java.awt.Color(255, 255, 0));
         btnLimpiarEstudiante.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
+        btnLimpiarEstudiante.setForeground(new java.awt.Color(102, 0, 204));
         btnLimpiarEstudiante.setText("Limpiar");
         btnLimpiarEstudiante.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -323,6 +325,7 @@ public CargaDatosEstudiantes() {
         jPanel1.add(btnLimpiarEstudiante, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 570, 180, 54));
 
         jButton3.setBackground(new java.awt.Color(255, 255, 0));
+        jButton3.setForeground(new java.awt.Color(102, 0, 204));
         jButton3.setText("Volver");
         jButton3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {

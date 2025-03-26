@@ -308,7 +308,7 @@ private class MultipleURLClickListener extends java.awt.event.MouseAdapter {
                 String text = txtRespuesta.getText();
                 
                 // Encontramos la línea donde se hizo clic
-                int caretPosition = txtRespuesta.viewToModel2D(evt.getPoint());
+                int caretPosition = txtRespuesta.viewToModel(evt.getPoint());
                 int lineStart = 0;
                 int lineEnd = text.length();
                 
@@ -381,7 +381,7 @@ private class MultipleURLClickListener extends java.awt.event.MouseAdapter {
         tituloConsultae.setFont(new java.awt.Font("Dialog", 1, 48)); // NOI18N
         tituloConsultae.setForeground(new java.awt.Color(255, 255, 255));
         tituloConsultae.setText("Consulta Docente");
-        bgCE.add(tituloConsultae, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 10, -1, -1));
+        bgCE.add(tituloConsultae, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 10, -1, -1));
 
         cmbEstadoCD.setForeground(new java.awt.Color(0, 0, 0));
         cmbEstadoCD.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "-", "Activo", "Inactivo" }));
@@ -424,13 +424,13 @@ private class MultipleURLClickListener extends java.awt.event.MouseAdapter {
                 txtNombreCActionPerformed(evt);
             }
         });
-        bgCE.add(txtNombreC, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 130, 190, -1));
+        bgCE.add(txtNombreC, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 130, 190, -1));
 
         JLNombreC.setBackground(new java.awt.Color(255, 255, 255));
         JLNombreC.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
         JLNombreC.setForeground(new java.awt.Color(255, 255, 255));
         JLNombreC.setText("Nombre");
-        bgCE.add(JLNombreC, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 100, -1, -1));
+        bgCE.add(JLNombreC, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 100, -1, -1));
 
         txtAnioC.setBackground(new java.awt.Color(255, 255, 255));
         txtAnioC.setForeground(new java.awt.Color(204, 204, 204));
@@ -468,16 +468,17 @@ private class MultipleURLClickListener extends java.awt.event.MouseAdapter {
 
         btnLimpiarD.setBackground(new java.awt.Color(255, 255, 0));
         btnLimpiarD.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
-        btnLimpiarD.setForeground(new java.awt.Color(0, 0, 0));
+        btnLimpiarD.setForeground(new java.awt.Color(102, 0, 204));
         btnLimpiarD.setText("Limpiar");
         btnLimpiarD.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnLimpiarDActionPerformed(evt);
             }
         });
-        bgCE.add(btnLimpiarD, new org.netbeans.lib.awtextra.AbsoluteConstraints(530, 180, 140, 40));
+        bgCE.add(btnLimpiarD, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 180, 140, 40));
 
         btnVolverCD.setBackground(new java.awt.Color(255, 255, 0));
+        btnVolverCD.setForeground(new java.awt.Color(102, 0, 204));
         btnVolverCD.setText("Volver");
         btnVolverCD.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -488,14 +489,14 @@ private class MultipleURLClickListener extends java.awt.event.MouseAdapter {
 
         btnConsultarD.setBackground(new java.awt.Color(255, 255, 0));
         btnConsultarD.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
-        btnConsultarD.setForeground(new java.awt.Color(0, 0, 0));
+        btnConsultarD.setForeground(new java.awt.Color(102, 0, 204));
         btnConsultarD.setText("Consultar");
         btnConsultarD.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnConsultarDActionPerformed(evt);
             }
         });
-        bgCE.add(btnConsultarD, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 180, 140, 40));
+        bgCE.add(btnConsultarD, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 180, 140, 40));
 
         txtRespuesta.setBackground(new java.awt.Color(204, 204, 204));
         txtRespuesta.setColumns(20);
@@ -632,7 +633,7 @@ private class MultipleURLClickListener extends java.awt.event.MouseAdapter {
         txtApellidosC.setText("Ingrese los apellidos");
         txtApellidosC.setForeground(Color.gray);
         cmbEstadoCD.setSelectedIndex(0);
-        txtRespuesta.setText("                          agrega información en los campos para poder filtrar");
+        txtRespuesta.setText("                                     agrega información en los campos para poder filtrar");
         txtRespuesta.setForeground(Color.gray);
     }//GEN-LAST:event_btnLimpiarDActionPerformed
 
